@@ -22,4 +22,12 @@ repos:
         additional_dependencies:
           - django-stubs[compatible-mypy]
           - djangorestframework-stubs
+          - python-decouple
+          - django
+          - djangorestframework
+          - djangorestframework-simplejwt
+          - django-htmx
+          - django-redis
+          - django-cors-headers
+          - cloudinary
         args: ["--config-file=pyproject.toml"]
