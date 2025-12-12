@@ -20,12 +20,10 @@ A high-performance event and marketing orchestration platform built with **Djang
 3. [Architecture](#architecture)
 4. [System Architecture](#system-architecture)
 5. [Tech Stack](#tech-stack)
-6. [Project Structure](#project-structure)
-7. [Development Workflow](#development-workflow)
-8. [Quality & Tooling](#quality--tooling)
-9. [Environment Setup](#environment-setup)
-10. [Running the Application](#running-the-application)
-11. [License](#license)
+6. [Development Workflow](#development-workflow)
+7. [Environment Setup](#environment-setup)
+8. [Running the Application](#running-the-application)
+9. [License](#license)
 
 ----------
 
@@ -80,7 +78,7 @@ Designed to grow into:
 
 ## **Architecture**
 
-```
+```bash
 root
 ├─ config/              # Django configuration & settings
 ├─ apps/
@@ -210,7 +208,7 @@ python manage.py runserver
 
 Create a `.env` file (already in .gitignore):
 
-```
+```bash
 DEBUG=True
 SECRET_KEY=your-secret-key
 DATABASE_URL=sqlite:///db.sqlite3
@@ -235,7 +233,7 @@ Open: **<http://127.0.0.1:8000/>**
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-```
+```bash
 MIT License
 
 Copyright (c) 2024 DXP Odin

@@ -1,2 +1,7 @@
+from django.http import HttpRequest, HttpResponse
 
-# Create your views here.
+
+def hx_ping(request: HttpRequest) -> HttpResponse:
+    return HttpResponse(
+        "<span class='text-emerald-400 font-medium'>HTMX + Tailwind are alive ⚡</span>"
+    )

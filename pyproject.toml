@@ -24,8 +24,11 @@ dependencies = [
     "gunicorn>=23.0,<24.0",
     "uvicorn[standard]>=0.30,<1.0",
     "cloudinary>=1.41,<2.0",
+    "django-cloudinary-storage>=0.3.0,<0.4.0",
     "django-cors-headers>=4.4,<5.0",
+    "wagtail>=6.0,<8.0",
 ]
+
 
 [project.optional-dependencies]
 dev = [
@@ -66,6 +69,18 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "config.settings"
 ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "wagtail.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "modelcluster.*"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "taggit.*"
+ignore_missing_imports = true
 
 [tool.django-stubs]
 django_settings_module = "config.settings"

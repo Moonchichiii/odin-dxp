@@ -30,4 +30,6 @@ repos:
           - django-redis
           - django-cors-headers
           - cloudinary
+          - django-cloudinary-storage
+          - wagtail
         args: ["--config-file=pyproject.toml"]

@@ -1,0 +1,79 @@
+{% load cloudinary_helper %}
+
+<section class="relative min-h-[calc(100vh-4rem)] overflow-hidden bg-slate-950">
+
+    <!-- 1. Background Media Logic -->
+    {% if self.video_public_id %}
+    <video
+        class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60"
+        autoplay muted loop playsinline
+        poster="{% cld_img self.poster_public_id width=1920 %}"
+    >
+        <!-- Desktop Video -->
+        <source src="{% cld_video self.video_public_id width=1920 %}" type="video/mp4" />
+        <!-- Mobile Video (Save bandwidth) -->
+        <source src="{% cld_video self.video_public_id width=768 %}" media="(max-width: 768px)" type="video/mp4" />
+    </video>
+    {% else %}
+        <!-- Fallback if no video is provided -->
+        <img
+                src="{% cld_img self.poster_public_id width=1920 %}"
+                class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60"
+                alt="Hero background"
+        />
+    {% endif %}
+
+    <!-- 2. Overlay Content -->
+    <!-- UPDATED: bg-gradient-to-t -> bg-linear-to-t -->
+    <div class="relative z-10 flex min-h-[calc(100vh-4rem)] items-center justify-center bg-linear-to-t from-slate-950 via-slate-950/20 to-slate-950/40">
+        <div class="mx-auto max-w-5xl px-6 text-center">
+
+            <p class="mb-6 font-mono text-xs uppercase tracking-[0.3em] text-emerald-400">
+                Event Intelligence
+            </p>
+
+            <h1 class="font-display text-5xl font-bold leading-tight text-white md:text-7xl lg:text-8xl drop-shadow-2xl">
+                {{ self.title }}
+                {% if self.subtitle %}
+                        <!-- UPDATED: bg-gradient-to-r -> bg-linear-to-r -->
+                        <span class="block text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-cyan-400">
+                                {{ self.subtitle }}
+                        </span>
+                {% endif %}
+            </h1>
+
+            {% if self.description %}
+            <div class="mt-8 text-lg text-slate-300 md:text-xl max-w-3xl mx-auto leading-relaxed text-balance">
+                {{ self.description }}
+            </div>
+            {% endif %}
+
+            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <!-- Main CTA -->
+                {% if self.cta_link %}
+                <a href="{{ self.cta_link }}" class="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white px-8 py-4 transition-transform hover:scale-105">
+                        <!-- UPDATED: bg-gradient-to-r -> bg-linear-to-r -->
+                        <span class="absolute inset-0 bg-linear-to-r from-emerald-400 to-cyan-400 opacity-0 transition-opacity group-hover:opacity-20"></span>
+                        <span class="relative font-sans text-sm font-bold tracking-wide text-slate-950 uppercase">
+                                {{ self.cta_text }}
+                        </span>
+                </a>
+                {% endif %}
+
+                <!-- HTMX System Check -->
+                <button
+                        hx-get="{% url 'core:htmx-ping' %}"
+                        hx-target="#status-{{ block.id }}"
+                        hx-swap="innerHTML"
+                        class="px-8 py-4 rounded-full border border-white/10 hover:bg-white/5 text-slate-300 hover:text-white text-sm font-medium transition-colors"
+                >
+                        Check System Status
+                </button>
+            </div>
+
+            <!-- UPDATED: min-h-[20px] -> min-h-5 -->
+            <div id="status-{{ block.id }}" class="mt-4 min-h-5 text-xs font-mono text-emerald-500/80"></div>
+
+        </div>
+    </div>
+</section>

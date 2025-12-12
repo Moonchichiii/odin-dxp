@@ -1,58 +1,85 @@
 """
-Django settings for config project.
+Django settings for DXP Odin.
 
 High-performance event & marketing platform:
-- Django + DRF + SimpleJWT
-- HTMX
-- Redis cache
-- Cloudinary
-- Wagtail/django CMS integration
+- Django 5.x + Wagtail 7.x
+- Cloudinary Storage
+- Redis Cache
+- HTMX + Tailwind
+- DRF API
 """
 
+from __future__ import annotations
+
+from datetime import timedelta
 from pathlib import Path
 
 from decouple import Csv, config
 
+# ---------------------------------------------------------------------------
+# 1. Base Configuration
+# ---------------------------------------------------------------------------
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# -------------------------------------------------------------------
-# Core / environment
-# -------------------------------------------------------------------
+SECRET_KEY: str = config("SECRET_KEY")
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
-
-# Environment: "dev" or "prod" (default: dev)
 ENV = config("DJP_ENV", default="dev").lower()
 
-DEBUG = config("DEBUG", default=True, cast=bool)
+DEBUG: bool = config("DJANGO_DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = config(
-    "ALLOWED_HOSTS",
-    default="localhost,127.0.0.1",
+ALLOWED_HOSTS: list[str] = config(
+    "DJANGO_ALLOWED_HOSTS",
+    default="127.0.0.1,localhost",
     cast=Csv(),
 )
 
-# -------------------------------------------------------------------
-# Application definition
-# -------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 2. Application Definition
+# ---------------------------------------------------------------------------
 
-INSTALLED_APPS = [
-    # Django core apps
+DJANGO_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+]
 
-    # Third-party
+THIRD_PARTY_APPS = [
+    # API & Auth
     "rest_framework",
     "rest_framework_simplejwt",
-    "django_htmx",
     "corsheaders",
 
-    # Project apps
+    # Frontend/Utils
+    "django_htmx",
+
+    # Cloudinary
+    "cloudinary_storage",
+    "cloudinary",
+
+    # Wagtail CMS Core
+    "wagtail.contrib.forms",
+    "wagtail.contrib.redirects",
+    "wagtail.contrib.sitemaps",
+    "wagtail.contrib.settings",
+    "wagtail.sites",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.search",
+    "wagtail.admin",
+    "wagtail",
+
+    # Wagtail Dependencies
+    "taggit",
+    "modelcluster",
+]
+
+LOCAL_APPS = [
     "apps.core",
     "apps.accounts",
     "apps.events",
@@ -63,50 +90,35 @@ INSTALLED_APPS = [
     "apps.ui",
 ]
 
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# ---------------------------------------------------------------------------
+# 3. Middleware
+# ---------------------------------------------------------------------------
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-
-    # CORS & common
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-
+    "django_htmx.middleware.HtmxMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-
-    # HTMX
-    "django_htmx.middleware.HtmxMiddleware",
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
 
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-                # "apps.core.context_processors.site_settings",  # later
-            ],
-        },
-    },
-]
-
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-# -------------------------------------------------------------------
-# Database
-# -------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 4. Database
+# ---------------------------------------------------------------------------
 
-# Simple default (sqlite) for dev; Postgres via env when needed.
 DB_ENGINE = config("DB_ENGINE", default="sqlite")
 
 if DB_ENGINE == "postgres":
@@ -128,93 +140,144 @@ else:
         }
     }
 
-# -------------------------------------------------------------------
-# Password validation
-# -------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 5. Templates
+# ---------------------------------------------------------------------------
 
-AUTH_PASSWORD_VALIDATORS = [
+TEMPLATES = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
     },
 ]
 
-# -------------------------------------------------------------------
-# Internationalization
-# -------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 6. Password Validation
+# ---------------------------------------------------------------------------
+
+AUTH_PASSWORD_VALIDATORS = [
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+# ---------------------------------------------------------------------------
+# 7. Internationalization
+# ---------------------------------------------------------------------------
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# -------------------------------------------------------------------
-# Static & media
-# -------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 8. Storage & Cloudinary
+# ---------------------------------------------------------------------------
 
-STATIC_URL = "/static/"
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
+# Cloudinary Configuration
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
+    'API_KEY': config('CLOUDINARY_API_KEY', default=''),
+    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+}
+
+# Modern Storage API
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# Legacy Fallbacks
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# -------------------------------------------------------------------
-# Redis cache (optional, enabled via REDIS_URL)
-# -------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 9. Cache (Redis)
+# ---------------------------------------------------------------------------
 
-REDIS_URL = config("REDIS_URL", default=None)
-
-if REDIS_URL:
+if ENV == "prod":
     CACHES = {
         "default": {
             "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": REDIS_URL,
+            "LOCATION": config("REDIS_URL", default="redis://127.0.0.1:6379/1"),
             "OPTIONS": {
                 "CLIENT_CLASS": "django_redis.client.DefaultClient",
             },
         }
     }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "unique-snowflake",
+        }
+    }
 
-# -------------------------------------------------------------------
-# DRF & JWT
-# -------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# 10. API & Security (DRF, JWT, CORS)
+# ---------------------------------------------------------------------------
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
+    "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-    ),
-    "DEFAULT_PERMISSION_CLASSES": (
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.AllowAny",
-    ),
+    ],
 }
-
-# SIMPLE_JWT – tweak later as needed
-from datetime import timedelta  # noqa: E402
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
-# -------------------------------------------------------------------
-# CORS / security
-# -------------------------------------------------------------------
-
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = config("CORS_ALLOW_ALL_ORIGINS", default=True, cast=bool)
 
-# Basic prod hardening when ENV=prod
+# ---------------------------------------------------------------------------
+# 11. Wagtail Configuration
+# ---------------------------------------------------------------------------
+
+WAGTAIL_SITE_NAME = "DXP Odin"
+WAGTAILADMIN_BASE_URL = config(
+    "WAGTAIL_ADMIN_BASE_URL",
+    default="http://localhost:8000",
+)
+
+# Search backend (Wagtail 7+)
+WAGTAILSEARCH_BACKENDS = {
+    "default": {
+        "BACKEND": "wagtail.search.backends.database",
+    }
+}
+
+# ---------------------------------------------------------------------------
+# 12. Production Security Hardening
+# ---------------------------------------------------------------------------
+
 if ENV == "prod":
     DEBUG = False
     SECURE_SSL_REDIRECT = True

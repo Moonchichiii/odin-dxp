@@ -1,2 +1,12 @@
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render
 
-# Create your views here.
+
+def home(request: HttpRequest) -> HttpResponse:
+    return render(request, "core/home_page.html")
+
+
+def hx_ping(request: HttpRequest) -> HttpResponse:
+    return HttpResponse(
+        "<span class='text-emerald-400 font-medium'>HTMX + Tailwind are alive ⚡</span>"
+    )

@@ -1,0 +1,17 @@
+{
+  "name": "odin-dxp",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev:css": "bunx tailwindcss -i ./assets/css/tailwind.css -o ./static/css/tailwind.css --watch",
+    "build:css": "bunx tailwindcss -i ./assets/css/tailwind.css -o ./static/css/tailwind.css --minify"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "tailwindcss": "^4.1.17"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

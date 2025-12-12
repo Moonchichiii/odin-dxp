@@ -1,2 +1,91 @@
+from django.db import models
+from wagtail.admin.panels import FieldPanel
+from wagtail.fields import StreamField
+from wagtail.models import Page
+from wagtail.snippets.models import register_snippet
 
-# Create your models here.
+from .blocks import ContentBlock, HeroBlock, PartnerGridBlock, SpeakerGridBlock
+
+# --- 1. Snippets (Reusable Data) ---
+
+
+@register_snippet
+class Speaker(models.Model):
+    name = models.CharField(max_length=255)
+    role = models.CharField(
+        max_length=255,
+        help_text="e.g. VP & Chief AI Scientist",
+    )
+    company = models.CharField(
+        max_length=255,
+        help_text="e.g. Meta",
+    )
+
+    # Cloudinary Public ID (Lightweight string, handled by our helper)
+    photo_public_id = models.CharField(
+        max_length=255,
+        help_text="Cloudinary Public ID (e.g. 'wsai/yann-lecun'). Use folder structure!",
+    )
+
+    linkedin_url = models.URLField(blank=True)
+    is_keynote = models.BooleanField(default=False)
+
+    panels = [
+        FieldPanel("name"),
+        FieldPanel("role"),
+        FieldPanel("company"),
+        FieldPanel("photo_public_id"),
+        FieldPanel("linkedin_url"),
+        FieldPanel("is_keynote"),
+    ]
+
+    def __str__(self) -> str:
+        return f"{self.name} - {self.company}"
+
+
+@register_snippet
+class Partner(models.Model):
+    name = models.CharField(max_length=255)
+    logo_public_id = models.CharField(max_length=255)
+    website = models.URLField(blank=True)
+    tier = models.CharField(
+        max_length=50,
+        choices=[
+            ("headline", "Headline"),
+            ("gold", "Gold"),
+            ("community", "Community"),
+        ],
+        default="community",
+    )
+
+    panels = [
+        FieldPanel("name"),
+        FieldPanel("logo_public_id"),
+        FieldPanel("website"),
+        FieldPanel("tier"),
+    ]
+
+    def __str__(self) -> str:
+        return str(self.name)
+
+
+# --- 2. The Page Model ---
+
+
+class HomePage(Page):
+    body = StreamField(
+        [
+            ("hero", HeroBlock()),
+            ("content_section", ContentBlock()),
+            ("speaker_grid", SpeakerGridBlock()),
+            ("partner_grid", PartnerGridBlock()),
+        ],
+        use_json_field=True,
+    )
+
+    content_panels = Page.content_panels + [
+        FieldPanel("body"),
+    ]
+
+    class Meta:
+        verbose_name = "Home Page"

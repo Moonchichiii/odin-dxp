@@ -1,0 +1,45 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <title>{% block title %}DXP Odin{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="DXP Odin – high-performance event and marketing platform powered by Django, Wagtail CMS, HTMX, and Tailwind CSS."
+    />
+
+    <!-- Preload core fonts -->
+    <link
+      rel="preload"
+      href="{% static 'fonts/Satoshi-Regular.woff2' %}"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="{% static 'fonts/ClashDisplay-Regular.woff2' %}"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+
+    <!-- Tailwind build -->
+    <link rel="stylesheet" href="{% static 'css/tailwind.css' %}" />
+  </head>
+  <body class="min-h-full bg-slate-950 text-slate-50 font-sans">
+    {% include "partials/header.html" %}
+
+    <main class="min-h-[calc(100vh-4rem)]">
+      {% block content %}{% endblock %}
+    </main>
+
+    {% include "partials/footer.html" %}
+  </body>
+</html>

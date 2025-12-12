@@ -1,0 +1,214 @@
+/* =========================================
+   DXP ODIN - PREMIUM ADMIN THEME
+   ========================================= */
+
+:root {
+    /* --- Palette Overrides --- */
+    --w-color-primary: #10b981;       /* Emerald 500 */
+    --w-color-primary-200: #6ee7b7;   /* Emerald 300 */
+    --w-color-secondary: #0f172a;     /* Slate 900 */
+
+    /* --- Sidebar (Deep Dark) --- */
+    --w-color-menu-background: #020617;      /* Slate 950 */
+    --w-color-menu-logo-background: #020617;
+    --w-color-menu-text: #94a3b8;            /* Slate 400 */
+    --w-color-menu-item-hover-bg: #1e293b;   /* Slate 800 */
+    --w-color-menu-item-hover-text: #f8fafc; /* Slate 50 */
+    --w-color-menu-item-active-bg: #10b981;  /* Emerald 500 */
+    --w-color-menu-item-active-text: #ffffff;
+
+    /* --- Typography --- */
+    --w-font-sans: 'Satoshi', system-ui, -apple-system, sans-serif;
+    --w-font-headings: 'ClashDisplay', system-ui, sans-serif;
+}
+
+/* =========================================
+   1. GLOBAL UI TWEAKS
+   ========================================= */
+
+body {
+    background-color: #f1f5f9; /* Slate 100 - Clean contrast for content */
+}
+
+/* Sidebar Branding Area */
+.sidebar-branding {
+    border-bottom: 1px solid #1e293b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hide the bird, show the text cleaner */
+.sidebar-branding__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: var(--w-font-headings);
+    letter-spacing: 0.05em;
+    font-weight: 700;
+}
+
+/* Buttons */
+.button.button-longrunning-active,
+.button.button-primary {
+    background-color: var(--w-color-primary);
+    border: 1px solid var(--w-color-primary);
+    border-radius: 6px;
+    font-weight: 600;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+    transition: all 0.2s ease;
+}
+
+.button.button-primary:hover {
+    background-color: #059669; /* Emerald 600 */
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+}
+
+/* =========================================
+   2. DASHBOARD PANEL (The Command Center)
+   ========================================= */
+
+.odin-dashboard-card {
+    background: #0f172a;
+    color: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #1e293b;
+    margin-bottom: 2rem;
+}
+
+.odin-dashboard-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.odin-logo-mark {
+    font-size: 2.5rem;
+    background: rgba(16, 185, 129, 0.1);
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    color: #10b981;
+}
+
+.odin-dashboard-header h2 {
+    margin: 0;
+    font-family: var(--w-font-headings);
+    font-size: 1.5rem;
+    color: white;
+}
+
+.odin-dashboard-header p {
+    margin: 4px 0 0 0;
+    color: #94a3b8;
+}
+
+.badge {
+    font-size: 0.75rem;
+    background: #1e293b;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #10b981;
+    border: 1px solid #10b981;
+    margin-left: 8px;
+}
+
+.odin-status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #1e293b;
+}
+
+.status-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.status-item .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.status-item .value {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.text-emerald { color: #34d399; }
+.text-blue { color: #60a5fa; }
+
+/* =========================================
+   3. LOGIN SCREEN (Cyberpunk Vibe)
+   ========================================= */
+
+body.login {
+    background-color: #020617;
+    position: relative;
+}
+
+/* Background grid effect */
+body.login::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: -50%;
+    left: -50%;
+    z-index: -1;
+    background-image:
+        radial-gradient(circle at center, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+    animation: pulse 10s ease infinite alternate;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.05); opacity: 1; }
+}
+
+.login-content {
+    background-color: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 16px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 20px 50px -10px rgba(0,0,0,0.5);
+}
+
+.login-content h1 {
+    color: white;
+    font-family: var(--w-font-headings);
+}
+
+.login-content .field label {
+    color: #cbd5e1;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+}
+
+.login-content input[type="text"],
+.login-content input[type="password"] {
+    background-color: #1e293b;
+    border: 1px solid #334155;
+    color: white;
+    border-radius: 8px;
+}
+
+.login-content input:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
