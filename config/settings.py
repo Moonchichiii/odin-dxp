@@ -82,6 +82,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "apps.core",
     "apps.accounts",
+    "apps.admin_branding",
     "apps.events",
     "apps.campaigns",
     "apps.cms_integration",
