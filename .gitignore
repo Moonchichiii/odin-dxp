@@ -177,3 +177,6 @@ Thumbs.db
 *.key
 secrets.json
 tailwindcss.exe
+
+# Pre-commit cache override
+pc_cache/
