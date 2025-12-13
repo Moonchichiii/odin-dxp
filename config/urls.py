@@ -9,28 +9,17 @@ from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
 
 urlpatterns = [
-    # Django admin
     path("django-admin/", admin.site.urls),
-
-    # Wagtail admin
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
 
-    # Your JSON API
-#    path("api/", include("apps.api.urls")),
+    # Internal Django-only endpoints (HTMX, debug, tools)
+    path("internal/", include(("apps.core.urls", "core"), namespace="core")),
 
-    # Your HTMX / UI endpoints
-    #path("ui/", include("apps.ui.urls")),
-
-    # Our core views
-    path("", include(("apps.core.urls", "core"), namespace="core")),
-
-]
-
-# Wagtail's page serving
-urlpatterns += [
+    # Wagtail page tree (HomePage etc.)
     path("", include(wagtail_urls)),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # type: ignore
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  # type: ignore

@@ -4,14 +4,24 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev:css": "bunx tailwindcss -i ./assets/css/tailwind.css -o ./static/css/tailwind.css --watch",
-    "build:css": "bunx tailwindcss -i ./assets/css/tailwind.css -o ./static/css/tailwind.css --minify"
+    "dev:css": "bunx @tailwindcss/cli -i ./apps/admin_branding/static/css/odin-admin.css -o ./static/css/tailwind.css --watch",
+    "build:css": "bunx @tailwindcss/cli -i ./apps/admin_branding/static/css/odin-admin.css -o ./static/css/tailwind.css --minify",
+
+    "dev:js": "bun build ./static/js/alpine.ts --outdir ./static/dist --minify --watch",
+    "build:js": "bun build ./static/js/alpine.ts --outdir ./static/dist --minify",
+
+    "dev": "bun run dev:css & bun run dev:js",
+    "build": "bun run build:css && bun run build:js"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
     "@types/bun": "latest",
     "tailwindcss": "^4.1.17"
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "alpinejs": "^3.15.2"
   }
 }

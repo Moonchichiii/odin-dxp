@@ -1,10 +1,60 @@
-<footer class="border-t border-slate-800 bg-slate-950">
-  <div
-    class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-4 text-xs text-slate-500 sm:flex-row sm:px-6"
-  >
-    <p>© {% now "Y" %} DXP Odin · Event Intelligence Platform</p>
-    <p class="space-x-3">
-      <span>Built with Django · Wagtail · HTMX · Tailwind</span>
-    </p>
-  </div>
+{% load static wagtailsettings_tags %}
+{% get_settings use_default_site=True %}
+{% with nav_settings=settings.cms_integration.NavigationSettings %}
+
+<footer class="bg-slate-950 border-t border-white/5">
+    <div class="mx-auto max-w-7xl px-6 py-14">
+        <div class="grid gap-10 md:grid-cols-3">
+
+            <!-- Brand & Description -->
+            <div>
+                <h2 class="font-display text-xl font-bold text-white">DXP Odin</h2>
+                <p class="mt-3 text-sm leading-relaxed text-slate-300">
+                        {{ nav_settings.footer_description }}
+                </p>
+                <p class="mt-4 text-xs text-slate-400">
+                    © {% now "Y" %} DXP Odin. All rights reserved.
+                </p>
+            </div>
+
+            <!-- Dynamic Columns -->
+            <nav class="grid grid-cols-2 gap-6 text-sm">
+
+                <!-- Column 1 -->
+                <div class="space-y-3">
+                    <p class="font-mono text-xs uppercase tracking-wider text-slate-400">
+                            {{ nav_settings.footer_col_1_title }}
+                    </p>
+                    {% for block in nav_settings.footer_col_1_links %}
+                         <a class="block text-slate-300 hover:text-white transition-colors"
+                                href="{{ block.value.page.url|default:block.value.url }}">
+                                {{ block.value.label }}
+                         </a>
+                    {% endfor %}
+                </div>
+
+                <!-- Column 2 -->
+                <div class="space-y-3">
+                        <p class="font-mono text-xs uppercase tracking-wider text-slate-400">
+                                {{ nav_settings.footer_col_2_title }}
+                        </p>
+                        {% for block in nav_settings.footer_col_2_links %}
+                             <a class="block text-slate-300 hover:text-white transition-colors"
+                                    href="{{ block.value.page.url|default:block.value.url }}">
+                                    {{ block.value.label }}
+                             </a>
+                        {% endfor %}
+                </div>
+            </nav>
+
+            <!-- Tech Stack / Status -->
+            <div>
+                <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <p class="text-xs font-mono text-emerald-300">System Status</p>
+                    <p class="mt-1 text-sm text-slate-200">All Systems Operational</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </footer>
+{% endwith %}

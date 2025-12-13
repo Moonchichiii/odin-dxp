@@ -1,5 +1,11 @@
+from __future__ import annotations
+
+from typing import Any, Mapping, cast
+
 from django.db import models
-from wagtail.admin.panels import FieldPanel
+from wagtail import blocks
+from wagtail.admin.panels import FieldPanel, MultiFieldPanel
+from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.fields import StreamField
 from wagtail.models import Page
 from wagtail.snippets.models import register_snippet
@@ -73,6 +79,8 @@ class Partner(models.Model):
 
 
 class HomePage(Page):
+    template = "cms_integration/home_page.html"
+
     body = StreamField(
         [
             ("hero", HeroBlock()),
@@ -89,3 +97,62 @@ class HomePage(Page):
 
     class Meta:
         verbose_name = "Home Page"
+
+
+# --- 3. Navigation Settings ---
+
+
+class LinkBlock(blocks.StructBlock):
+    label = blocks.CharBlock()
+    page = blocks.PageChooserBlock(required=False)
+    url = blocks.URLBlock(required=False, label="External URL")
+
+    def get_url(self, value: Mapping[str, Any]) -> str:
+        page = value.get("page")
+        if page:
+            return cast(str, page.url)
+        return cast(str, value.get("url", ""))
+
+    class Meta:
+        icon = "link"
+
+
+@register_setting
+class NavigationSettings(BaseSiteSetting):
+    primary_navigation = StreamField(
+        [("link", LinkBlock())],
+        use_json_field=True,
+        blank=True,
+    )
+
+    # Footer Content
+    footer_description: models.TextField = models.TextField(
+        default="Event Intelligence Platform built for speed, clarity, and scale.",
+        max_length=250,
+    )
+
+    # Simple columnar structure for footer links
+    footer_col_1_title: models.CharField = models.CharField(default="Explore", max_length=50)
+    footer_col_1_links = StreamField([("link", LinkBlock())], use_json_field=True, blank=True)
+
+    footer_col_2_title: models.CharField = models.CharField(default="Company", max_length=50)
+    footer_col_2_links = StreamField([("link", LinkBlock())], use_json_field=True, blank=True)
+
+    panels = [
+        MultiFieldPanel(
+            [
+                FieldPanel("primary_navigation"),
+            ],
+            heading="Header Navigation",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("footer_description"),
+                FieldPanel("footer_col_1_title"),
+                FieldPanel("footer_col_1_links"),
+                FieldPanel("footer_col_2_title"),
+                FieldPanel("footer_col_2_links"),
+            ],
+            heading="Footer Content",
+        ),
+    ]

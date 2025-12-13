@@ -1,45 +1,100 @@
 {% load static %}
-
 <!doctype html>
-<html lang="en" class="h-full">
+<html lang="{% block html_lang %}en{% endblock %}" class="h-full scroll-smooth">
   <head>
     <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark light" />
+
+    {# ---- Primary SEO ---- #}
     <title>{% block title %}DXP Odin{% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    {# IMPORTANT: Lighthouse complained about missing meta description #}
     <meta
       name="description"
-      content="DXP Odin – high-performance event and marketing platform powered by Django, Wagtail CMS, HTMX, and Tailwind CSS."
+      content="{% block meta_description %}Event Intelligence Platform by DXP Odin.{% endblock %}"
     />
 
-    <!-- Preload core fonts -->
-    <link
-      rel="preload"
-      href="{% static 'fonts/Satoshi-Regular.woff2' %}"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="{% static 'fonts/ClashDisplay-Regular.woff2' %}"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    {# If you ever need: noindex on staging, etc. #}
+    <meta name="robots" content="{% block robots %}index,follow,max-image-preview:large{% endblock %}" />
 
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+    {# Canonical: override per-page with absolute URL if possible #}
+    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}" />
 
-    <!-- Tailwind build -->
+    {# ---- Open Graph / Facebook ---- #}
+    <meta property="og:site_name" content="{% block og_site_name %}DXP Odin{% endblock %}" />
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+    <meta property="og:title" content="{% block og_title %}{{ block.super }}{% endblock %}" />
+    <meta property="og:description" content="{% block og_description %}{{ block.super }}{% endblock %}" />
+    <meta property="og:url" content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}" />
+
+    {# Provide an absolute URL to a 1200x630 image if you can #}
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}{% endblock %}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    {# ---- Twitter ---- #}
+    <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}" />
+    <meta name="twitter:title" content="{% block twitter_title %}{{ block.super }}{% endblock %}" />
+    <meta name="twitter:description" content="{% block twitter_description %}{{ block.super }}{% endblock %}" />
+    <meta name="twitter:image" content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}{% endblock %}" />
+
+    {# ---- PWA / Icons ---- #}
+    <meta name="theme-color" content="#020617" />
+    <link rel="icon" href="{% static 'icons/favicon.ico' %}" sizes="any" />
+    <link rel="icon" href="{% static 'icons/icon.svg' %}" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}" />
+    <link rel="manifest" href="{% static 'site.webmanifest' %}" />
+
+    {# ---- Performance hints ---- #}
+    {# If you embed Cloudinary videos/iframes often, preconnect helps #}
+    <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
+    <link rel="preconnect" href="https://player.cloudinary.com" crossorigin />
+    <link rel="preconnect" href="https://unpkg.com" crossorigin />
+
+    {# Preload core fonts (you already do this 👍) #}
+    <link rel="preload" href="{% static 'fonts/Satoshi-Regular.woff2' %}" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="{% static 'fonts/ClashDisplay-Regular.woff2' %}" as="font" type="font/woff2" crossorigin />
+
+    {# CSS #}
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}" />
+
+    {# JS (defer = good) #}
+    <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+    <script src="{% static 'dist/alpine.js' %}" defer></script>
+
+    {# Optional: Structured data block (JSON-LD) #}
+    {% block structured_data %}{% endblock %}
+
+    {# Extra head hooks for specific pages #}
+    {% block extra_head %}{% endblock %}
   </head>
-  <body class="min-h-full bg-slate-950 text-slate-50 font-sans">
+
+  <body class="min-h-full bg-slate-950 text-slate-50 font-sans antialiased selection:bg-emerald-500/30">
+    {# Skip link for keyboard users #}
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-100 focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:text-slate-950"
+    >
+      Skip to content
+    </a>
+
     {% include "partials/header.html" %}
 
-    <main class="min-h-[calc(100vh-4rem)]">
+    <main id="main-content" class="min-h-[calc(100vh-4rem)]" role="main">
       {% block content %}{% endblock %}
     </main>
 
     {% include "partials/footer.html" %}
+
+    <noscript>
+      <div class="p-4 text-center text-sm text-slate-200 bg-slate-900">
+        This site works best with JavaScript enabled.
+      </div>
+    </noscript>
+
+    {% block extra_body %}{% endblock %}
   </body>
 </html>

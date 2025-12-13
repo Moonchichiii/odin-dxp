@@ -1,38 +1,46 @@
 from wagtail import blocks
+from wagtail.documents.blocks import DocumentChooserBlock
+from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 
 class HeroBlock(blocks.StructBlock):
     title = blocks.CharBlock(
-        required=True,
-        help_text="Main headline (e.g. 'Real-time event journeys')",
+        required=False,
+        help_text="Main headline (optional).",
     )
     subtitle = blocks.CharBlock(
         required=False,
-        help_text="Highlighted text (e.g. 'orchestrated by data')",
+        help_text="Highlighted text (optional).",
     )
     description = blocks.TextBlock(required=False)
 
-    # Cloudinary integration
+    # Option A (recommended for speed): Cloudinary IDs
     video_public_id = blocks.CharBlock(
         required=False,
-        label="Video Public ID",
-        help_text="e.g. 'odin/hero-bg'. Leave empty for image only.",
+        label="Video Public ID (Cloudinary)",
+        help_text="e.g. 'odin/hero-bg'. If set, takes priority over uploaded video.",
     )
     poster_public_id = blocks.CharBlock(
-        required=True,
-        label="Poster/Image Public ID",
-        help_text=(
-            "e.g. 'odin/hero-bg-poster'. Used for mobile "
-            "and while video loads."
-        ),
+        required=False,
+        label="Poster/Image Public ID (Cloudinary)",
+        help_text="e.g. 'odin/hero-bg-poster'. Used as fallback + while video loads.",
+    )
+
+    # Option B: Upload in Wagtail (optional)
+    video_upload = DocumentChooserBlock(
+        required=False,
+        label="Upload Video (optional)",
+        help_text="Upload MP4/WebM. Used only if Video Public ID is empty.",
+    )
+    poster_upload = ImageChooserBlock(
+        required=False,
+        label="Upload Poster Image (optional)",
+        help_text="Fallback image if no video, or while video loads.",
     )
 
     cta_text = blocks.CharBlock(required=False, default="Get Tickets")
-    cta_link = blocks.CharBlock(
-        required=False,
-        help_text="URL or relative path",
-    )
+    cta_link = blocks.CharBlock(required=False, help_text="URL or relative path")
 
     class Meta:
         template = "cms_integration/blocks/hero_block.html"
@@ -41,10 +49,6 @@ class HeroBlock(blocks.StructBlock):
 
 
 class ContentBlock(blocks.StructBlock):
-    """
-    For general text sections like the 'Back to the future' intro.
-    """
-
     heading = blocks.CharBlock(required=False)
     text = blocks.RichTextBlock()
 
@@ -58,7 +62,6 @@ class SpeakerGridBlock(blocks.StructBlock):
     title = blocks.CharBlock(default="Meet the Legends")
     description = blocks.TextBlock(required=False)
 
-    # Allow manual selection of speakers for the home page
     featured_speakers = blocks.ListBlock(
         SnippetChooserBlock("cms_integration.Speaker"),
         label="Select Speakers to highlight",
@@ -73,7 +76,6 @@ class SpeakerGridBlock(blocks.StructBlock):
 class PartnerGridBlock(blocks.StructBlock):
     title = blocks.CharBlock(default="Commercial Partners")
 
-    # Manual selection is safer for high-visibility pages like the home page
     partners = blocks.ListBlock(
         SnippetChooserBlock("cms_integration.Partner"),
         label="Select Partners to display",

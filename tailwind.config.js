@@ -12,9 +12,9 @@ module.exports = {
       },
       colors: {
         odin: {
-          bg: "#020617", // slate-950
-          accent: "#22c55e", // emerald-500
-          accentSoft: "#4ade80", // emerald-400
+          bg: "#020617",
+          accent: "#22c55e",
+          accentSoft: "#4ade80",
         },
       },
     },

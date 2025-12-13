@@ -3,7 +3,7 @@ from django.shortcuts import render
 
 
 def home(request: HttpRequest) -> HttpResponse:
-    return render(request, "core/home_page.html")
+    return render(request, "base.html")
 
 
 def hx_ping(request: HttpRequest) -> HttpResponse:
