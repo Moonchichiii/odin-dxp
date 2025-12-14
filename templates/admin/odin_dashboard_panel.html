@@ -1,0 +1,36 @@
+{# templates/admin/odin_dashboard_panel.html #}
+
+<div class="odin-dashboard-card">
+  <div class="odin-dashboard-header">
+    <h2>Client Quick Actions</h2>
+    <p style="color:#94a3b8; margin:0;">
+      Start here — safe editing, no code.
+    </p>
+  </div>
+
+  <div style="margin-top: 1.25rem; display:flex; flex-wrap:wrap; gap: 0.75rem;">
+    {% if home_edit_url %}
+      <a class="button button-primary" href="{{ home_edit_url }}">Edit Home page</a>
+    {% else %}
+      <a class="button button-primary" href="{{ pages_url }}">Pages</a>
+    {% endif %}
+
+    {% if nav_settings_url %}
+      <a class="button" href="{{ nav_settings_url }}">Header &amp; Footer Links</a>
+    {% endif %}
+
+    {% if speakers_url %}
+      <a class="button" href="{{ speakers_url }}">Speakers (People)</a>
+    {% endif %}
+
+    {% if partners_url %}
+      <a class="button" href="{{ partners_url }}">Sponsors &amp; Partners</a>
+    {% endif %}
+  </div>
+
+  <div style="margin-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem;">
+    <p style="margin:0; color:#94a3b8; font-size: 12px;">
+      Tip: most content lives in the Home page “Body” blocks. Reorder sections by dragging.
+    </p>
+  </div>
+</div>

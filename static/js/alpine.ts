@@ -7,5 +7,4 @@ declare global {
 }
 
 window.Alpine = Alpine;
-
 Alpine.start();

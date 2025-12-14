@@ -1,114 +1,121 @@
 {% load cloudinary_helper %}
 {% load wagtailcore_tags %}
 
-<section aria-label="Hero" class="relative min-h-[100svh] w-full overflow-hidden bg-slate-950">
+<section
+  aria-label="Hero"
+  class="relative w-full overflow-hidden bg-slate-950 min-h-[78svh] sm:min-h-svh"
+>
+  {# --- VIDEO/IMAGE LAYER --- #}
+  {% if self.video_public_id %}
+    <video
+      class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 object-[50%_30%] sm:object-center"
+      autoplay muted loop playsinline preload="metadata" aria-hidden="true"
+      {% if self.poster_public_id %}poster="{% cld_img self.poster_public_id width=1080 %}"{% endif %}
+    >
+      <source src="{% cld_video self.video_public_id width=1080 %}" type="video/mp4" />
+    </video>
 
-    {# --- VIDEO/IMAGE LAYER --- #}
-    {% if self.video_public_id %}
-        <video
-            class="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-60"
-            autoplay muted loop playsinline preload="metadata" aria-hidden="true"
-            {% if self.poster_public_id %}poster="{% cld_img self.poster_public_id width=1080 %}"{% endif %}
-        >
-            <source src="{% cld_video self.video_public_id width=1080 %}" type="video/mp4" />
-        </video>
-    {% elif self.video_upload %}
-        <video
-            class="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-60"
-            autoplay muted loop playsinline preload="metadata" aria-hidden="true"
-            {% if self.poster_upload %}poster="{{ self.poster_upload.file.url }}"{% endif %}
-        >
-            <source src="{{ self.video_upload.url }}" type="video/mp4" />
-        </video>
-    {% elif self.poster_public_id %}
-        <img
-            src="{% cld_img self.poster_public_id width=1080 %}"
-            class="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-60"
-            alt=""
-            aria-hidden="true"
-            loading="eager"
-            fetchpriority="high"
-        />
-    {% elif self.poster_upload %}
-        <img
-            src="{{ self.poster_upload.file.url }}"
-            class="pointer-events-none absolute inset-0 h-full w-full object-cover object-center opacity-60"
-            alt=""
-            aria-hidden="true"
-            loading="eager"
-            fetchpriority="high"
-        />
-    {% else %}
-        {# Cloudinary player fallback #}
-        <div class="pointer-events-none absolute inset-0 opacity-60" aria-hidden="true">
-            <iframe
-                title="Hero background video"
-                src="https://player.cloudinary.com/embed/?cloud_name=dakjlrean&public_id=dxp%2Fpya8mjvwedrkdlh5gbxo&profile=cld-looping"
-                class="absolute inset-0 h-full w-full"
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
-                allowfullscreen
-                frameborder="0"
-                loading="lazy"
-                referrerpolicy="strict-origin-when-cross-origin"
-            ></iframe>
-        </div>
-    {% endif %}
+  {% elif self.video_upload %}
+    <video
+      class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 object-[50%_30%] sm:object-center"
+      autoplay muted loop playsinline preload="metadata" aria-hidden="true"
+      {% if self.poster_upload %}poster="{{ self.poster_upload.file.url }}"{% endif %}
+    >
+      <source src="{{ self.video_upload.url }}" type="video/mp4" />
+    </video>
 
-    {# --- OVERLAY LAYER --- #}
-    <div class="absolute inset-0 bg-linear-to-b from-slate-950/90 via-slate-950/50 to-slate-950/90 pointer-events-none"></div>
+  {% elif self.poster_public_id %}
+    <img
+      src="{% cld_img self.poster_public_id width=1080 %}"
+      class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 object-[50%_30%] sm:object-center"
+      alt=""
+      aria-hidden="true"
+      loading="eager"
+      fetchpriority="high"
+    />
 
-    {# --- CONTENT LAYER --- #}
-    <div class="relative z-10 flex min-h-[100svh] items-center justify-center px-4">
-        <div class="relative mx-auto w-full max-w-5xl pt-[var(--header-h,5rem)] pb-10 text-center">
+  {% elif self.poster_upload %}
+    <img
+      src="{{ self.poster_upload.file.url }}"
+      class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-60 object-[50%_30%] sm:object-center"
+      alt=""
+      aria-hidden="true"
+      loading="eager"
+      fetchpriority="high"
+    />
 
-            {% if self.title or self.subtitle or self.description %}
-                <p class="mb-5 font-mono text-xs uppercase tracking-[0.3em] text-emerald-300 animate-fade-in">
-                    Event Intelligence
-                </p>
-
-                {% if self.title %}
-                    <h1 class="font-display text-4xl font-bold leading-tight text-white sm:text-5xl md:text-7xl lg:text-8xl drop-shadow-2xl">
-                        {{ self.title }}
-                        {% if self.subtitle %}
-                            <span class="block text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-cyan-400">
-                                {{ self.subtitle }}
-                            </span>
-                        {% endif %}
-                    </h1>
-                {% endif %}
-
-                {% if self.description %}
-                    <div class="mt-6 text-base text-slate-200 sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed text-balance">
-                        {{ self.description }}
-                    </div>
-                {% endif %}
-            {% endif %}
-
-            <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-                {% if self.cta_link %}
-                    <a
-                        href="{{ self.cta_link }}"
-                        class="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white px-8 py-4 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-950"
-                    >
-                        <span class="absolute inset-0 bg-linear-to-r from-emerald-400 to-cyan-400 opacity-0 transition-opacity group-hover:opacity-20"></span>
-                        <span class="relative font-sans text-sm font-bold tracking-wide text-slate-950 uppercase">
-                            {{ self.cta_text|default:"Get Tickets" }}
-                        </span>
-                    </a>
-                {% endif %}
-
-                <button
-                    type="button"
-                    hx-get="{% url 'core:htmx-ping' %}"
-                    hx-target="#status-{{ block.id }}"
-                    hx-swap="innerHTML"
-                    class="px-8 py-4 rounded-full border border-white/15 hover:bg-white/5 text-slate-200 hover:text-white text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-950"
-                >
-                    Check System Status
-                </button>
-            </div>
-
-            <div id="status-{{ block.id }}" class="mt-4 min-h-5 text-xs font-mono text-emerald-500/80" aria-live="polite"></div>
-        </div>
+  {% else %}
+    <div class="pointer-events-none absolute inset-0 opacity-60" aria-hidden="true">
+      <iframe
+        title="Hero background video"
+        src="https://player.cloudinary.com/embed/?cloud_name=dakjlrean&public_id=dxp%2Fpya8mjvwedrkdlh5gbxo&profile=cld-looping"
+        class="absolute inset-0 h-full w-full"
+        allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+        allowfullscreen
+        frameborder="0"
+        loading="lazy"
+        referrerpolicy="strict-origin-when-cross-origin"
+      ></iframe>
     </div>
+  {% endif %}
+
+  {# --- OVERLAY LAYER --- #}
+  <div class="absolute inset-0 pointer-events-none bg-linear-to-b from-slate-950/95 via-slate-950/55 to-slate-950/95"></div>
+
+  {# --- CONTENT LAYER --- #}
+  <div class="relative z-10 flex items-end sm:items-center justify-center px-4 min-h-[78svh] sm:min-h-svh">
+    <div
+      class="relative mx-auto w-full max-w-5xl pb-10 text-center"
+      style="padding-top: var(--header-h, 5rem);"
+    >
+      {% if self.title or self.subtitle or self.description %}
+        <p class="mb-5 font-mono text-xs uppercase tracking-[0.3em] text-emerald-300">
+          Event Intelligence
+        </p>
+
+        {% if self.title %}
+          <h1 class="font-display text-4xl font-bold leading-tight text-white sm:text-5xl md:text-7xl lg:text-8xl drop-shadow-2xl">
+            {{ self.title }}
+            {% if self.subtitle %}
+              <span class="block text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-cyan-400">
+                {{ self.subtitle }}
+              </span>
+            {% endif %}
+          </h1>
+        {% endif %}
+
+        {% if self.description %}
+          <div class="mt-6 text-base text-slate-200 sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed text-balance">
+            {{ self.description }}
+          </div>
+        {% endif %}
+      {% endif %}
+
+      <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        {% if self.cta_link %}
+          <a
+            href="{{ self.cta_link }}"
+            class="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-white px-8 py-4 transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-950"
+          >
+            <span class="absolute inset-0 bg-linear-to-r from-emerald-400 to-cyan-400 opacity-0 transition-opacity group-hover:opacity-20"></span>
+            <span class="relative font-sans text-sm font-bold tracking-wide text-slate-950 uppercase">
+              {{ self.cta_text|default:"Get Tickets" }}
+            </span>
+          </a>
+        {% endif %}
+
+        <button
+          type="button"
+          hx-get="{% url 'core:htmx-ping' %}"
+          hx-target="#status-{{ block.id }}"
+          hx-swap="innerHTML"
+          class="px-8 py-4 rounded-full border border-white/15 hover:bg-white/5 text-slate-200 hover:text-white text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-slate-950"
+        >
+          Check System Status
+        </button>
+      </div>
+
+      <div id="status-{{ block.id }}" class="mt-4 min-h-5 text-xs font-mono text-emerald-500/80" aria-live="polite"></div>
+    </div>
+  </div>
 </section>

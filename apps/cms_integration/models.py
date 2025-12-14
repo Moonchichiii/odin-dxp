@@ -45,6 +45,10 @@ class Speaker(models.Model):
         FieldPanel("is_keynote"),
     ]
 
+    class Meta:
+        verbose_name = "Speaker (Person)"
+        verbose_name_plural = "Speakers (People)"
+
     def __str__(self) -> str:
         return f"{self.name} - {self.company}"
 
@@ -70,6 +74,10 @@ class Partner(models.Model):
         FieldPanel("website"),
         FieldPanel("tier"),
     ]
+
+    class Meta:
+        verbose_name = "Sponsor / Partner"
+        verbose_name_plural = "Sponsors & Partners"
 
     def __str__(self) -> str:
         return str(self.name)
@@ -117,7 +125,7 @@ class LinkBlock(blocks.StructBlock):
         icon = "link"
 
 
-@register_setting
+@register_setting(icon="link", order=100)
 class NavigationSettings(BaseSiteSetting):
     primary_navigation = StreamField(
         [("link", LinkBlock())],
@@ -156,3 +164,5 @@ class NavigationSettings(BaseSiteSetting):
             heading="Footer Content",
         ),
     ]
+class Meta:
+        verbose_name = "Header & Footer Links"
