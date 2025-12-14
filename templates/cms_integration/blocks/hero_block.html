@@ -9,7 +9,6 @@
 >
 
     {# ================= BACKGROUND MEDIA (Parallax Layer) ================= #}
-    {# scale-110 prevents empty gaps when we scroll. translate3d moves it. #}
     <div
         class="absolute inset-0 z-0 select-none scale-110 origin-top will-change-transform"
         :style="'transform: translate3d(0, ' + (scroll * 0.4) + 'px, 0)'"
@@ -64,18 +63,11 @@
     </div>
 
     {# ================= GRADIENT OVERLAYS (z-10) ================= #}
-    {# Top gradient for nav visibility #}
     <div class="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-slate-950/90 to-transparent z-10 pointer-events-none"></div>
-
-    {# Bottom gradient for smooth transition #}
     <div class="absolute bottom-0 inset-x-0 h-64 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none"></div>
-
-    {# Full screen dim #}
     <div class="absolute inset-0 bg-slate-950/30 z-10 pointer-events-none"></div>
 
-
     {# ================= CONTENT CONTAINER (z-30) ================= #}
-    {# Added transform to make text move slightly opposite to background for depth #}
     <div
         class="relative z-30 w-full max-w-7xl mx-auto px-6 pt-20 flex flex-col items-center text-center will-change-transform"
         :style="'transform: translate3d(0, -' + (scroll * 0.1) + 'px, 0); opacity: ' + (1 - scroll/500)"
@@ -125,8 +117,10 @@
         {# --- 4. CTA Buttons --- #}
         {% if self.cta_buttons %}
             <div class="mt-10 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-                {% for block in self.cta_buttons %}
-                    {% with cta=block.value %}
+                {% for item in self.cta_buttons %}
+                    {% with cta=item.value|default:item %}
+
+                        {# SAFETY CHECK: Only show button if Page OR Url is set #}
                         {% if cta.page or cta.url %}
                             <a href="{% if cta.page %}{{ cta.page.url }}{% else %}{{ cta.url }}{% endif %}"
                                class="
@@ -148,14 +142,15 @@
                                 {% endif %}
                             </a>
                         {% endif %}
+
                     {% endwith %}
                 {% endfor %}
             </div>
         {% endif %}
+
     </div>
 
     {# ================= SCROLL DOWN INDICATOR ================= #}
-    {# Fades out as you scroll #}
     <div
         class="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 pointer-events-none animate-bounce"
         :style="'opacity: ' + (1 - scroll/200)"
