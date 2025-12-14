@@ -1,36 +1,40 @@
-{# templates/admin/odin_dashboard_panel.html #}
-
 <div class="odin-dashboard-card">
-  <div class="odin-dashboard-header">
-    <h2>Client Quick Actions</h2>
-    <p style="color:#94a3b8; margin:0;">
-      Start here — safe editing, no code.
-    </p>
-  </div>
+    <div class="odin-dashboard-header">
+        <h2>Client Quick Actions</h2>
+        <p style="color:#94a3b8; margin:0;">
+            Start here — safe editing, no code.
+        </p>
+    </div>
 
-  <div style="margin-top: 1.25rem; display:flex; flex-wrap:wrap; gap: 0.75rem;">
-    {% if home_edit_url %}
-      <a class="button button-primary" href="{{ home_edit_url }}">Edit Home page</a>
-    {% else %}
-      <a class="button button-primary" href="{{ pages_url }}">Pages</a>
-    {% endif %}
+    <div style="margin-top: 1.25rem; display:flex; flex-wrap:wrap; gap: 0.75rem;">
+        {% if home_edit_url %}
+            <a class="button button-primary" href="{{ home_edit_url }}">Edit Home page</a>
+        {% else %}
+            <a class="button button-primary" href="{{ pages_url }}">Pages</a>
+        {% endif %}
 
-    {% if nav_settings_url %}
-      <a class="button" href="{{ nav_settings_url }}">Header &amp; Footer Links</a>
-    {% endif %}
+        {% if header_settings_url %}
+            <a class="button" href="{{ header_settings_url }}">Header</a>
+        {% endif %}
 
-    {% if speakers_url %}
-      <a class="button" href="{{ speakers_url }}">Speakers (People)</a>
-    {% endif %}
+        {% if footer_settings_url %}
+            <a class="button" href="{{ footer_settings_url }}">Footer</a>
+        {% endif %}
 
-    {% if partners_url %}
-      <a class="button" href="{{ partners_url }}">Sponsors &amp; Partners</a>
-    {% endif %}
-  </div>
+        {% if speakers_url %}
+            <a class="button" href="{{ speakers_url }}">Speakers (People)</a>
+        {% endif %}
 
-  <div style="margin-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem;">
-    <p style="margin:0; color:#94a3b8; font-size: 12px;">
-      Tip: most content lives in the Home page “Body” blocks. Reorder sections by dragging.
-    </p>
-  </div>
+        {% if partners_url %}
+            <a class="button" href="{{ partners_url }}">Sponsors &amp; Partners</a>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem;">
+        <p style="margin:0; color:#94a3b8; font-size: 12px; line-height: 1.5;">
+            <strong>Tip:</strong> Most content lives in the Home page “Body” blocks (drag to reorder).<br>
+            For Google & Social Media, use the new <strong>“SEO & Social”</strong> tab when editing pages.<br>
+            Add Q&A for voice search using the <strong>“AEO / FAQ Section”</strong> block.
+        </p>
+    </div>
 </div>

@@ -4,6 +4,28 @@ from wagtail.images.blocks import ImageChooserBlock
 from wagtail.snippets.blocks import SnippetChooserBlock
 
 
+class HeroCtaBlock(blocks.StructBlock):
+    """
+    Reusable CTA block specifically for the Hero section.
+    """
+    label = blocks.CharBlock(required=True, max_length=50)
+    page = blocks.PageChooserBlock(required=False)
+    url = blocks.URLBlock(required=False, label="External URL")
+    style = blocks.ChoiceBlock(
+        choices=[
+            ("primary", "Primary"),
+            ("secondary", "Secondary"),
+            ("ghost", "Ghost"),
+        ],
+        default="primary",
+        required=False,
+    )
+
+    class Meta:
+        icon = "link"
+        label = "Hero CTA"
+
+
 class HeroBlock(blocks.StructBlock):
     title = blocks.CharBlock(
         required=False,
@@ -14,6 +36,24 @@ class HeroBlock(blocks.StructBlock):
         help_text="Highlighted text (optional).",
     )
     description = blocks.TextBlock(required=False)
+
+    extra_images = blocks.ListBlock(
+        ImageChooserBlock(required=False),
+        required=False,
+        label="Extra hero images (optional)",
+        help_text="Logos / badges displayed over the hero background.",
+    )
+
+    extra_images_position = blocks.ChoiceBlock(
+        choices=[
+            ("top", "Top"),
+            ("center", "Center"),
+            ("bottom", "Bottom"),
+        ],
+        default="top",
+        required=False,
+        label="Extra images position",
+    )
 
     # Option A (recommended for speed): Cloudinary IDs
     video_public_id = blocks.CharBlock(
@@ -39,8 +79,13 @@ class HeroBlock(blocks.StructBlock):
         help_text="Fallback image if no video, or while video loads.",
     )
 
-    cta_text = blocks.CharBlock(required=False, default="Get Tickets")
-    cta_link = blocks.CharBlock(required=False, help_text="URL or relative path")
+    # Updated: List of buttons instead of single link
+    cta_buttons = blocks.ListBlock(
+        HeroCtaBlock(),
+        required=False,
+        label="Hero CTA buttons",
+        help_text="Add one or more buttons under the hero text.",
+    )
 
     class Meta:
         template = "cms_integration/blocks/hero_block.html"
@@ -85,3 +130,21 @@ class PartnerGridBlock(blocks.StructBlock):
         template = "cms_integration/blocks/partner_grid_block.html"
         icon = "gem"
         label = "Partner Logos"
+
+class FAQItemBlock(blocks.StructBlock):
+    question = blocks.CharBlock(required=True, label="Question")
+    answer = blocks.RichTextBlock(required=True, label="Answer")
+
+    class Meta:
+        icon = "help"
+        label = "FAQ Item"
+
+
+class FAQSectionBlock(blocks.StructBlock):
+    title = blocks.CharBlock(default="Frequently Asked Questions")
+    faqs = blocks.ListBlock(FAQItemBlock(), label="Questions")
+
+    class Meta:
+        template = "cms_integration/blocks/faq_section_block.html"
+        icon = "help"
+        label = "AEO / FAQ Section"

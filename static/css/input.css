@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+/* 1. Tell Tailwind where to look for classes */
+@source "../../templates";
+@source "../../apps";
+
+/* 2. Configure your Theme (Fonts & Colors) */
+@theme {
+  /* Use your local fonts, fall back to system sans-serif */
+  --font-sans: "Satoshi", sans-serif;
+  --font-display: "ClashDisplay", sans-serif;
+
+  /* Your custom branding colors */
+  --color-odin-bg: #020617;
+  --color-odin-card: #0F172A;
+  --color-odin-border: #1E293B;
+
+  /* Custom Animation */
+  --animate-fade-in-up: fadeInUp 0.8s ease-out forwards;
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* 3. Load your Local Fonts */
+@font-face {
+  font-family: "Satoshi";
+  src: url("../fonts/Satoshi-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("../fonts/Satoshi-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Satoshi";
+  src: url("../fonts/Satoshi-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ClashDisplay";
+  src: url("../fonts/ClashDisplay-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "ClashDisplay";
+  src: url("../fonts/ClashDisplay-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 4. Alpine.js Utility */
+@utility x-cloak {
+  display: none !important;
+}

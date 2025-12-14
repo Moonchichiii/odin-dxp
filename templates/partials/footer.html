@@ -1,6 +1,8 @@
 {% load static wagtailsettings_tags %}
 {% get_settings use_default_site=True %}
-{% with nav_settings=settings.cms_integration.NavigationSettings %}
+
+{# Access our specific model from the settings object #}
+{% with footer=settings.cms_integration.FooterSettings %}
 
 <footer class="bg-slate-950 border-t border-white/5">
     <div class="mx-auto max-w-7xl px-6 py-14">
@@ -10,7 +12,7 @@
             <div>
                 <h2 class="font-display text-xl font-bold text-white">DXP Odin</h2>
                 <p class="mt-3 text-sm leading-relaxed text-slate-300">
-                        {{ nav_settings.footer_description }}
+                    {{ footer.footer_description }}
                 </p>
                 <p class="mt-4 text-xs text-slate-400">
                     © {% now "Y" %} DXP Odin. All rights reserved.
@@ -23,33 +25,36 @@
                 <!-- Column 1 -->
                 <div class="space-y-3">
                     <p class="font-mono text-xs uppercase tracking-wider text-slate-400">
-                            {{ nav_settings.footer_col_1_title }}
+                        {{ footer.footer_col_1_title }}
                     </p>
-                    {% for block in nav_settings.footer_col_1_links %}
+                    {% for block in footer.footer_col_1_links %}
+                         {% with item=block.value %}
                          <a class="block text-slate-300 hover:text-white transition-colors"
-                                href="{{ block.value.page.url|default:block.value.url }}">
-                                {{ block.value.label }}
+                            href="{{ item.page.url|default:item.url }}">
+                            {{ item.label }}
                          </a>
+                         {% endwith %}
                     {% endfor %}
                 </div>
 
                 <!-- Column 2 -->
                 <div class="space-y-3">
-                        <p class="font-mono text-xs uppercase tracking-wider text-slate-400">
-                                {{ nav_settings.footer_col_2_title }}
-                        </p>
-                        {% for block in nav_settings.footer_col_2_links %}
-                             <a class="block text-slate-300 hover:text-white transition-colors"
-                                    href="{{ block.value.page.url|default:block.value.url }}">
-                                    {{ block.value.label }}
-                             </a>
-                        {% endfor %}
+                    <p class="font-mono text-xs uppercase tracking-wider text-slate-400">
+                        {{ footer.footer_col_2_title }}
+                    </p>
+                    {% for block in footer.footer_col_2_links %}
+                         {% with item=block.value %}
+                         <a class="block text-slate-300 hover:text-white transition-colors"
+                            href="{{ item.page.url|default:item.url }}">
+                            {{ item.label }}
+                         </a>
+                         {% endwith %}
+                    {% endfor %}
                 </div>
             </nav>
 
-
-            </div>
         </div>
     </div>
 </footer>
+
 {% endwith %}

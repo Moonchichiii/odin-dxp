@@ -1,8 +1,8 @@
-{% load static wagtailcore_tags wagtailsettings_tags %}
+{% load static wagtailcore_tags wagtailsettings_tags wagtailimages_tags %}
 {% get_settings use_default_site=True %}
 
-{# Access our specific model from the settings object #}
-{% with nav_settings=settings.cms_integration.NavigationSettings %}
+{# Access our NEW specific model from the settings object #}
+{% with header=settings.cms_integration.HeaderSettings %}
 
 <header
     x-data="{
@@ -26,30 +26,78 @@
 
         <!-- Logo -->
         <a href="/" class="group flex items-center gap-3 z-50 relative">
-             <img src="{% static 'img/Website_brain.webp' %}" alt="Odin" width="40" class="h-10 w-auto">
-            <span class="font-display text-lg md:text-xl font-bold tracking-tight text-white">
-                DXP <span class="text-emerald-400">Odin</span>
-            </span>
+            {% if header.logo_image %}
+                {% image header.logo_image original as logo %}
+                <img
+                  src="{{ logo.url }}"
+                  width="{{ logo.width }}"
+                  height="{{ logo.height }}"
+                  alt="{{ header.logo_alt_text|default:'DXP Odin' }}"
+                  class="h-10 w-auto object-contain transition-transform group-hover:scale-105"
+                  loading="eager"
+                  decoding="async"
+                />
+            {% else %}
+                <span class="font-display text-lg md:text-xl font-bold tracking-tight text-white">
+                    DXP <span class="text-emerald-400">Odin</span>
+                </span>
+            {% endif %}
         </a>
 
-        <!-- Desktop Nav (Dynamic) -->
+        <!-- Desktop Nav (Dynamic with Dropdowns) -->
         <nav class="hidden lg:flex items-center gap-8">
-            {% for block in nav_settings.primary_navigation %}
-                {% with item=block.value %}
-                <a href="{{ item.page.url|default:item.url }}"
-                   class="relative text-sm font-medium tracking-wide text-slate-300 hover:text-white transition-colors py-2 group">
+          {% for block in header.primary_navigation %}
+            {% with item=block.value %}
+              {% with href=item.page.url|default:item.url %}
+                {% if item.children %}
+                  <div class="relative group">
+                    <a href="{{ href|default:'#' }}"
+                       class="relative text-sm font-medium tracking-wide text-slate-300 hover:text-white transition-colors py-2 inline-flex items-center gap-2">
+                      {{ item.label }}
+                      <span class="text-slate-400 group-hover:text-white transition-colors">▾</span>
+                    </a>
+
+                    <div class="absolute left-0 top-full mt-2 hidden group-hover:block pt-2">
+                      <div class="min-w-56 rounded-xl border border-white/10 bg-[#020617]/95 backdrop-blur-xl shadow-2xl p-2">
+                        {% for child in item.children %}
+                          <a href="{{ child.page.url|default:child.url }}"
+                             class="block rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-white/5 hover:text-white transition-colors">
+                            {{ child.label }}
+                          </a>
+                        {% endfor %}
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <a href="{{ href }}"
+                     class="relative text-sm font-medium tracking-wide text-slate-300 hover:text-white transition-colors py-2 group">
                     {{ item.label }}
                     <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
-                </a>
-                {% endwith %}
-            {% endfor %}
+                  </a>
+                {% endif %}
+              {% endwith %}
+            {% endwith %}
+          {% endfor %}
         </nav>
 
-        <!-- CTA -->
-        <div class="hidden lg:flex items-center gap-6">
-            <a href="#" class="group relative inline-flex items-center justify-center overflow-hidden rounded-full bg-emerald-500 px-6 py-2.5 transition-transform hover:scale-105">
-                <span class="relative text-sm font-bold tracking-wide text-white">Get Tickets</span>
-            </a>
+        <!-- CTA Buttons (Dynamic) -->
+        <div class="hidden lg:flex items-center gap-3">
+          {% for block in header.cta_buttons %}
+            {% with cta=block.value %}
+              <a href="{{ cta.page.url|default:cta.url }}"
+                 class="
+                   {% if cta.style == 'primary' %}
+                     inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-2.5 text-sm font-bold text-white transition-transform hover:scale-105
+                   {% elif cta.style == 'secondary' %}
+                     inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-2.5 text-sm font-bold text-white hover:bg-white/5 transition-colors
+                   {% else %}
+                     inline-flex items-center justify-center px-3 py-2 text-sm text-slate-200 hover:text-white font-semibold transition-colors
+                   {% endif %}
+                 ">
+                {{ cta.label }}
+              </a>
+            {% endwith %}
+          {% endfor %}
         </div>
 
         <!-- Mobile Menu Toggle -->
@@ -66,20 +114,52 @@
         x-transition.opacity
         class="fixed inset-0 z-40 bg-[#020617] pt-28 px-6 lg:hidden flex flex-col h-screen overflow-y-auto"
     >
-        <nav class="flex flex-col gap-6 text-center">
-            {% for block in nav_settings.primary_navigation %}
+        <nav class="flex flex-col gap-6 text-center pb-12">
+            <!-- Mobile Links -->
+            {% for block in header.primary_navigation %}
                 {% with item=block.value %}
-                <a href="{{ item.page.url|default:item.url }}"
-                   @click="close()"
-                   class="text-2xl font-display font-bold text-white hover:text-emerald-400">
-                    {{ item.label }}
-                </a>
+                <div class="flex flex-col items-center">
+                    <a href="{{ item.page.url|default:item.url }}"
+                       @click="close()"
+                       class="text-2xl font-display font-bold text-white hover:text-emerald-400 transition-colors">
+                        {{ item.label }}
+                    </a>
+
+                    {% if item.children %}
+                        <div class="mt-3 flex flex-col gap-3">
+                            {% for child in item.children %}
+                                <a href="{{ child.page.url|default:child.url }}"
+                                   @click="close()"
+                                   class="text-base font-semibold text-slate-400 hover:text-white transition-colors">
+                                    {{ child.label }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
                 {% endwith %}
             {% endfor %}
 
-            <a href="#" class="mt-8 mx-auto w-full max-w-xs rounded-full bg-emerald-500 py-4 text-center text-white font-bold">
-                Get Tickets
-            </a>
+            <!-- Mobile CTAs -->
+            <div class="mt-6 flex flex-col gap-3 px-4">
+                {% for block in header.cta_buttons %}
+                  {% with cta=block.value %}
+                    <a href="{{ cta.page.url|default:cta.url }}"
+                       @click="close()"
+                       class="
+                         {% if cta.style == 'primary' %}
+                           mx-auto w-full max-w-xs rounded-full bg-emerald-500 py-4 text-center text-white font-bold transition-transform hover:scale-105
+                         {% elif cta.style == 'secondary' %}
+                           mx-auto w-full max-w-xs rounded-full border border-white/15 py-4 text-center text-white font-bold hover:bg-white/5 transition-colors
+                         {% else %}
+                           mx-auto w-full max-w-xs py-3 text-center text-slate-200 hover:text-white font-semibold transition-colors
+                         {% endif %}
+                       ">
+                      {{ cta.label }}
+                    </a>
+                  {% endwith %}
+                {% endfor %}
+            </div>
         </nav>
     </div>
 </header>

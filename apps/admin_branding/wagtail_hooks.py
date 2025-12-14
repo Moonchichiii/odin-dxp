@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 from django.forms import Media
 from django.http import HttpRequest
@@ -11,7 +11,9 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.html import format_html
 from django.utils.safestring import SafeString
 from wagtail import hooks
-from wagtail.models import Page
+
+# Import your specific homepage model to find it reliably
+from apps.cms_integration.models import HomePage
 
 
 def safe_reverse(viewname: str, *args: Any) -> str:
@@ -24,7 +26,8 @@ def safe_reverse(viewname: str, *args: Any) -> str:
 @hooks.register("insert_global_admin_css")
 def global_admin_css() -> SafeString:
     """Inject Odin admin branding CSS (Wagtail admin only)."""
-    return format_html('<link rel="stylesheet" href="{}">', static("css/odin-admin.css"))
+    # Updated to point to the minified output file
+    return format_html('<link rel="stylesheet" href="{}">', static("css/odin-admin.min.css"))
 
 
 @hooks.register("construct_main_menu")
@@ -37,6 +40,7 @@ def clean_sidebar_menu(_request: Any, menu_items: list[Any]) -> None:
 @dataclass
 class ClientQuickActionsPanel:
     """Dashboard panel: quick links to the most common editor areas."""
+
     order: int = 0
 
     @property
@@ -47,9 +51,15 @@ class ClientQuickActionsPanel:
         request: HttpRequest = parent_context["request"]
 
         # Settings
-        nav_settings_url = safe_reverse("wagtailsettings:edit", "cms_integration", "navigationsettings")
-        if not nav_settings_url:
-            nav_settings_url = safe_reverse("wagtailsettings:index")
+        settings_index = safe_reverse("wagtailsettings:index")
+
+        header_settings_url = safe_reverse("wagtailsettings:edit", "cms_integration", "headersettings")
+        footer_settings_url = safe_reverse("wagtailsettings:edit", "cms_integration", "footersettings")
+
+        # Fallbacks
+        if not header_settings_url or not footer_settings_url:
+            header_settings_url = header_settings_url or settings_index
+            footer_settings_url = footer_settings_url or settings_index
 
         # Snippets (fallback to snippets index)
         snippets_index = safe_reverse("wagtailsnippets:index")
@@ -59,11 +69,11 @@ class ClientQuickActionsPanel:
         # Pages fallback
         pages_url = safe_reverse("wagtailadmin_explore_root")
 
-        # Home page edit (best effort)
+        # Home page edit (Safe Version)
         home_edit_url = ""
         try:
-            root = Page.get_first_root_node()
-            homepage = root.get_children().live().specific().first()
+            # Find the first live HomePage instance safely
+            homepage = cast(Any, HomePage.objects).live().first()
             if homepage:
                 home_edit_url = safe_reverse("wagtailadmin_pages:edit", homepage.id)
         except Exception:
@@ -72,7 +82,8 @@ class ClientQuickActionsPanel:
         context = {
             "home_edit_url": home_edit_url,
             "pages_url": pages_url,
-            "nav_settings_url": nav_settings_url,
+            "header_settings_url": header_settings_url,
+            "footer_settings_url": footer_settings_url,
             "speakers_url": speakers_url,
             "partners_url": partners_url,
         }
