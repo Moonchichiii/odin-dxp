@@ -8,6 +8,7 @@ class HeroCtaBlock(blocks.StructBlock):
     """
     Reusable CTA block specifically for the Hero section.
     """
+
     label = blocks.CharBlock(required=True, max_length=50)
     page = blocks.PageChooserBlock(required=False)
     url = blocks.URLBlock(required=False, label="External URL")
@@ -130,6 +131,7 @@ class PartnerGridBlock(blocks.StructBlock):
         template = "cms_integration/blocks/partner_grid_block.html"
         icon = "gem"
         label = "Partner Logos"
+
 
 class FAQItemBlock(blocks.StructBlock):
     question = blocks.CharBlock(required=True, label="Question")

@@ -12,10 +12,8 @@ urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
-
     # Internal Django-only endpoints (HTMX, debug, tools)
     path("internal/", include(("apps.core.urls", "core"), namespace="core")),
-
     # Wagtail page tree (HomePage etc.)
     path("", include(wagtail_urls)),
 ]

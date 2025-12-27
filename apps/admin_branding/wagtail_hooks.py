@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Any, cast
 
@@ -11,36 +12,83 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.html import format_html
 from django.utils.safestring import SafeString
 from wagtail import hooks
+from wagtail.admin.menu import MenuItem
 
-# Import your specific homepage model to find it reliably
 from apps.cms_integration.models import HomePage
 
+logger = logging.getLogger(__name__)
 
-def safe_reverse(viewname: str, *args: Any) -> str:
+
+def safe_reverse(viewname: str, *args: Any, **kwargs: Any) -> str:
+    """
+    Reverse helper that never crashes the admin UI.
+
+    We log at DEBUG level so you can enable it when needed.
+    """
     try:
-        return reverse(viewname, args=args)
-    except NoReverseMatch:
+        return reverse(viewname, args=args, kwargs=kwargs)
+    except NoReverseMatch as e:
+        logger.debug("NoReverseMatch for %s args=%s kwargs=%s (%s)", viewname, args, kwargs, e)
         return ""
+
+
+def snippet_list_url(app_label: str, model_name: str) -> str:
+    """
+    Wagtail snippet URLs vary by version / configuration.
+
+    Try:
+      1) Namespaced URL: wagtailsnippets_{app}_{model}:list  (newer Wagtail)
+      2) Older pattern: wagtailsnippets:list (app, model)
+    """
+    # Newer Wagtail pattern
+    url = safe_reverse(f"wagtailsnippets_{app_label}_{model_name}:list")
+    if url:
+        return url
+
+    # Older Wagtail pattern
+    url = safe_reverse("wagtailsnippets:list", app_label, model_name)
+    if url:
+        return url
+
+    # Last resort: snippets index (so buttons still appear, just less specific)
+    return safe_reverse("wagtailsnippets:index") or ""
 
 
 @hooks.register("insert_global_admin_css")
 def global_admin_css() -> SafeString:
-    """Inject Odin admin branding CSS (Wagtail admin only)."""
-    # Updated to point to the minified output file
-    return format_html('<link rel="stylesheet" href="{}">', static("css/odin-admin.min.css"))
+    return format_html('<link rel="stylesheet" href="{}">', static("css/odin-admin.css"))
+
+
+@hooks.register("register_admin_menu_item")
+def register_speakers_menu_item() -> MenuItem:
+    return MenuItem(
+        "Speakers",
+        snippet_list_url("cms_integration", "speaker"),
+        icon_name="user",
+        order=205,
+        classname="odin-menu-speakers",
+    )
+
+
+@hooks.register("register_admin_menu_item")
+def register_sponsors_menu_item() -> MenuItem:
+    return MenuItem(
+        "Sponsors",
+        snippet_list_url("cms_integration", "partner"),
+        icon_name="group",
+        order=210,
+        classname="odin-menu-sponsors",
+    )
 
 
 @hooks.register("construct_main_menu")
 def clean_sidebar_menu(_request: Any, menu_items: list[Any]) -> None:
-    """Hide generic items so editors focus on content."""
-    hidden = {"help", "reports"}
+    hidden = {"help", "reports", "snippets"}
     menu_items[:] = [item for item in menu_items if getattr(item, "name", "") not in hidden]
 
 
 @dataclass
 class ClientQuickActionsPanel:
-    """Dashboard panel: quick links to the most common editor areas."""
-
     order: int = 0
 
     @property
@@ -52,27 +100,23 @@ class ClientQuickActionsPanel:
 
         # Settings
         settings_index = safe_reverse("wagtailsettings:index")
+        header_settings_url = (
+            safe_reverse("wagtailsettings:edit", "cms_integration", "headersettings") or settings_index
+        )
+        footer_settings_url = (
+            safe_reverse("wagtailsettings:edit", "cms_integration", "footersettings") or settings_index
+        )
 
-        header_settings_url = safe_reverse("wagtailsettings:edit", "cms_integration", "headersettings")
-        footer_settings_url = safe_reverse("wagtailsettings:edit", "cms_integration", "footersettings")
+        # Snippets (robust)
+        speakers_url = snippet_list_url("cms_integration", "speaker")
+        partners_url = snippet_list_url("cms_integration", "partner")
 
-        # Fallbacks
-        if not header_settings_url or not footer_settings_url:
-            header_settings_url = header_settings_url or settings_index
-            footer_settings_url = footer_settings_url or settings_index
-
-        # Snippets (fallback to snippets index)
-        snippets_index = safe_reverse("wagtailsnippets:index")
-        speakers_url = safe_reverse("wagtailsnippets:list", "cms_integration", "speaker") or snippets_index
-        partners_url = safe_reverse("wagtailsnippets:list", "cms_integration", "partner") or snippets_index
-
-        # Pages fallback
+        # Pages
         pages_url = safe_reverse("wagtailadmin_explore_root")
 
-        # Home page edit (Safe Version)
+        # Home page edit
         home_edit_url = ""
         try:
-            # Find the first live HomePage instance safely
             homepage = cast(Any, HomePage.objects).live().first()
             if homepage:
                 home_edit_url = safe_reverse("wagtailadmin_pages:edit", homepage.id)

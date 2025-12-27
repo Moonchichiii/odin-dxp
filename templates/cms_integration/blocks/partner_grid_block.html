@@ -1,0 +1,13 @@
+<section class="bg-odin-bg py-24">
+  <div class="mx-auto max-w-7xl px-6">
+    <div class="text-center mb-16">
+      <h2 class="font-display text-4xl md:text-5xl font-bold text-white mb-4">{{ self.title }}</h2>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {% for item in self.partners %}
+        {% include "cms_integration/partials/cards/sponsor_card.html" with sponsor=item %}
+      {% endfor %}
+    </div>
+  </div>
+</section>

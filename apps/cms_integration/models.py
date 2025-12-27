@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Mapping, cast
 
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.functions import Lower  # Imported for robust constraints
 from wagtail import blocks
 from wagtail.admin.panels import FieldPanel, MultiFieldPanel, ObjectList, TabbedInterface
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
@@ -45,7 +47,6 @@ class SEOAttributes(models.Model):
         help_text="Tells Google/AI what this page represents.",
     )
 
-    # Panels to be used in the Promote tab
     seo_panels = [
         MultiFieldPanel(
             [
@@ -74,13 +75,10 @@ class Speaker(models.Model):
         max_length=255,
         help_text="e.g. Meta",
     )
-
-    # Cloudinary Public ID (Lightweight string, handled by our helper)
     photo_public_id = models.CharField(
         max_length=255,
         help_text="Cloudinary Public ID (e.g. 'name,role,company'). Use folder structure!",
     )
-
     linkedin_url = models.URLField(blank=True)
     is_keynote = models.BooleanField(default=False)
 
@@ -96,9 +94,42 @@ class Speaker(models.Model):
     class Meta:
         verbose_name = "Speaker (Person)"
         verbose_name_plural = "Speakers (People)"
+        # 5a. Robust Constraint: Prevent duplicate Name + Company (Case Insensitive)
+        constraints = [
+            models.UniqueConstraint(
+                Lower("name"),
+                Lower("company"),
+                name="uniq_speaker_name_company_ci",
+            )
+        ]
 
     def __str__(self) -> str:
         return f"{self.name} - {self.company}"
+
+    def clean(self) -> None:
+        """Sanitize input and provide friendly error messages."""
+        # Sanitize inputs before validation logic
+        self.name = self.name.strip()
+        self.company = self.company.strip()
+
+        super().clean()
+
+        # Check for duplicates excluding self (for updates)
+        # Using iexact for case-insensitive check matches the DB constraint
+        if (
+            Speaker.objects.exclude(pk=self.pk)
+            .filter(
+                name__iexact=self.name,
+                company__iexact=self.company,
+            )
+            .exists()
+        ):
+            raise ValidationError(
+                {
+                    "name": "This speaker already exists for this company.",
+                    "company": "This speaker already exists for this company.",
+                }
+            )
 
 
 @register_snippet
@@ -126,9 +157,26 @@ class Partner(models.Model):
     class Meta:
         verbose_name = "Sponsor / Partner"
         verbose_name_plural = "Sponsors & Partners"
+        # 5b. Robust Constraint: Prevent duplicate Partner names (Case Insensitive)
+        constraints = [
+            models.UniqueConstraint(
+                Lower("name"),
+                name="uniq_partner_name_ci",
+            )
+        ]
 
     def __str__(self) -> str:
         return str(self.name)
+
+    def clean(self) -> None:
+        """Sanitize input and provide friendly error messages."""
+        # Sanitize input
+        self.name = self.name.strip()
+
+        super().clean()
+
+        if Partner.objects.exclude(pk=self.pk).filter(name__iexact=self.name).exists():
+            raise ValidationError({"name": "A sponsor/partner with this name already exists."})
 
 
 # --- 2. The Page Model (Updated with SEO/AEO) ---
@@ -171,7 +219,6 @@ class HomePage(SEOAttributes, Page):
         help_text="City/Venue for Schema",
     )
 
-    # Content tab
     content_panels = Page.content_panels + [
         MultiFieldPanel(
             [
@@ -185,10 +232,8 @@ class HomePage(SEOAttributes, Page):
         FieldPanel("body"),
     ]
 
-    # SEO tab (Promote + our mixin panels)
     promote_panels = Page.promote_panels + SEOAttributes.seo_panels
 
-    # Editor tabs
     edit_handler = TabbedInterface(
         [
             ObjectList(content_panels, heading="Content"),
@@ -204,7 +249,6 @@ class HomePage(SEOAttributes, Page):
 # --- 3. Global Site Settings ---
 
 
-# 3a. Shared Blocks
 class LinkBlock(blocks.StructBlock):
     label = blocks.CharBlock(required=True)
     page = blocks.PageChooserBlock(required=False)
@@ -225,8 +269,6 @@ class NavItemBlock(blocks.StructBlock):
     label = blocks.CharBlock(required=True)
     page = blocks.PageChooserBlock(required=False)
     url = blocks.URLBlock(required=False, label="External URL")
-
-    # Submenu items (optional)
     children = blocks.ListBlock(
         LinkBlock(),
         required=False,
@@ -270,7 +312,6 @@ class CtaLinkBlock(blocks.StructBlock):
         label = "CTA button"
 
 
-# 3b. Header Settings
 @register_setting(icon="site", order=100)
 class HeaderSettings(BaseSiteSetting):
     logo_image: models.ForeignKey = models.ForeignKey(
@@ -286,7 +327,6 @@ class HeaderSettings(BaseSiteSetting):
         help_text="Accessibility alt text for the logo (optional).",
     )
 
-    # Updated to use NavItemBlock for dropdown support
     primary_navigation = StreamField(
         [("item", NavItemBlock())],
         use_json_field=True,
@@ -294,7 +334,6 @@ class HeaderSettings(BaseSiteSetting):
         help_text="Top navigation (supports optional dropdown children).",
     )
 
-    # Added CTA buttons
     cta_buttons = StreamField(
         [("cta", CtaLinkBlock())],
         use_json_field=True,
@@ -318,7 +357,6 @@ class HeaderSettings(BaseSiteSetting):
         verbose_name = "Header"
 
 
-# 3c. Footer Settings
 @register_setting(icon="doc-full-inverse", order=110)
 class FooterSettings(BaseSiteSetting):
     footer_description: models.TextField = models.TextField(
@@ -344,5 +382,6 @@ class FooterSettings(BaseSiteSetting):
             heading="Footer",
         )
     ]
+
     class Meta:
         verbose_name = "Footer"

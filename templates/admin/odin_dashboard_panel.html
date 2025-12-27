@@ -1,37 +1,72 @@
+{% load i18n wagtailadmin_tags %}
+
 <div class="odin-dashboard-card">
+    {# FIX: Styles to ensure icons sit next to text without exploding in size #}
+    <style>
+        .odin-dashboard-card .button {
+            display: inline-flex;
+            align-items: center;
+        }
+        .odin-dashboard-card .button .icon {
+            width: 14px !important;
+            height: 14px !important;
+            margin-right: 8px;
+            fill: currentColor;
+            vertical-align: middle;
+        }
+    </style>
+
     <div class="odin-dashboard-header">
         <h2>Client Quick Actions</h2>
-        <p style="color:#94a3b8; margin:0;">
+        <p style="color: var(--w-color-text-context, #94a3b8); margin: 0;">
             Start here — safe editing, no code.
         </p>
     </div>
 
-    <div style="margin-top: 1.25rem; display:flex; flex-wrap:wrap; gap: 0.75rem;">
+    {# --- Action Buttons Grid --- #}
+    <div style="margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.75rem;">
+
+        {# 1. Home Page #}
         {% if home_edit_url %}
-            <a class="button button-primary" href="{{ home_edit_url }}">Edit Home page</a>
+            <a class="button button-primary" href="{{ home_edit_url }}">
+                {% icon name="home" %} Edit Home Page
+            </a>
         {% else %}
-            <a class="button button-primary" href="{{ pages_url }}">Pages</a>
+            <a class="button button-primary" href="{{ pages_url }}">
+                {% icon name="folder-open-inverse" %} Pages
+            </a>
         {% endif %}
 
+        {# 2. Global Settings #}
         {% if header_settings_url %}
-            <a class="button" href="{{ header_settings_url }}">Header</a>
+            <a class="button" href="{{ header_settings_url }}">
+                {% icon name="site" %} Header
+            </a>
         {% endif %}
 
         {% if footer_settings_url %}
-            <a class="button" href="{{ footer_settings_url }}">Footer</a>
+            <a class="button" href="{{ footer_settings_url }}">
+                {% icon name="doc-full-inverse" %} Footer
+            </a>
         {% endif %}
 
+        {# 3. Snippets (Specifically linked in wagtail_hooks.py) #}
         {% if speakers_url %}
-            <a class="button" href="{{ speakers_url }}">Speakers (People)</a>
+            <a class="button" href="{{ speakers_url }}">
+                {% icon name="user" %} Speakers
+            </a>
         {% endif %}
 
         {% if partners_url %}
-            <a class="button" href="{{ partners_url }}">Sponsors &amp; Partners</a>
+            <a class="button" href="{{ partners_url }}">
+                {% icon name="group" %} Sponsors
+            </a>
         {% endif %}
     </div>
 
+    {# --- Helper Tip Footer --- #}
     <div style="margin-top: 1.25rem; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 1rem;">
-        <p style="margin:0; color:#94a3b8; font-size: 12px; line-height: 1.5;">
+        <p style="margin: 0; color: var(--w-color-text-context, #94a3b8); font-size: 12px; line-height: 1.5;">
             <strong>Tip:</strong> Most content lives in the Home page “Body” blocks (drag to reorder).<br>
             For Google & Social Media, use the new <strong>“SEO & Social”</strong> tab when editing pages.<br>
             Add Q&A for voice search using the <strong>“AEO / FAQ Section”</strong> block.

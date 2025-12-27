@@ -1,11 +1,17 @@
 {% load static wagtailimages_tags %}
 <!doctype html>
-<html lang="{% block html_lang %}en{% endblock %}" class="h-full scroll-smooth antialiased">
+<html
+  lang="{% block html_lang %}en{% endblock %}"
+  class="h-full scroll-smooth antialiased"
+>
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
     <meta name="color-scheme" content="dark light" />
 
     {# ---- Primary SEO ---- #}
@@ -29,13 +35,24 @@
       content="{% block meta_description %}{% if page %}{{ page.search_description|default:'Event Intelligence Platform by DXP Odin.' }}{% else %}Event Intelligence Platform by DXP Odin.{% endif %}{% endblock %}"
     />
 
-    <meta name="robots" content="{% block robots %}index,follow,max-image-preview:large{% endblock %}" />
-    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}" />
+    <meta
+      name="robots"
+      content="{% block robots %}index,follow,max-image-preview:large{% endblock %}"
+    />
+    <link
+      rel="canonical"
+      href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}"
+    />
 
     {# ---- Open Graph ---- #}
-    <meta property="og:site_name" content="{% block og_site_name %}{{ request.site.site_name|default:"DXP Odin" }}{% endblock %}" />
-    <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
-
+    <meta
+      property="og:site_name"
+      content="{% block og_site_name %}{{ request.site.site_name|default:"DXP Odin" }}{% endblock %}"
+    />
+    <meta
+      property="og:type"
+      content="{% block og_type %}website{% endblock %}"
+    />
     <meta
       property="og:title"
       content="{% block og_title %}{% if page and page.seo_title %}{{ page.seo_title }}{% elif page and page.title %}{{ page.title }}{% else %}DXP Odin{% endif %}{% endblock %}"
@@ -44,100 +61,104 @@
       property="og:description"
       content="{% block og_description %}{% if page %}{{ page.search_description|default:'' }}{% else %}Event Intelligence Platform by DXP Odin.{% endif %}{% endblock %}"
     />
-    <meta property="og:url" content="{% block og_url %}{% if page and page.full_url %}{{ page.full_url }}{% else %}{{ request.build_absolute_uri }}{% endif %}{% endblock %}" />
+    <meta
+      property="og:url"
+      content="{% block og_url %}{% if page and page.full_url %}{{ page.full_url }}{% else %}{{ request.build_absolute_uri }}{% endif %}{% endblock %}"
+    />
 
-    {# OG Image: Page specific -> Fallback to Static (still overridable via og_image block) #}
+    {# OG Image #}
     {% block og_image %}
       {% if page and page.og_image %}
         {% image page.og_image original as og_img %}
-        <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ og_img.url }}" />
+        <meta
+          property="og:image"
+          content="{{ request.scheme }}://{{ request.get_host }}{{ og_img.url }}"
+        />
         <meta property="og:image:width" content="{{ og_img.width }}" />
         <meta property="og:image:height" content="{{ og_img.height }}" />
       {% else %}
-        <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}" />
+        <meta
+          property="og:image"
+          content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}"
+        />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
       {% endif %}
     {% endblock %}
 
-    {# ---- Twitter ---- #}
-    <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}" />
+    <meta
+      name="twitter:card"
+      content="{% block twitter_card %}summary_large_image{% endblock %}"
+    />
 
-    {# ---- JSON-LD (safe, fully expanded) ---- #}
+    {# ---- JSON-LD ---- #}
     {% block json_ld %}
       <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        {% if page and page.structured_data_type == "Event" %}
-          "@type": "Event",
-          "name": "{{ page.title|escapejs }}",
-          {% if page.event_start_date %}"startDate": "{{ page.event_start_date|date:'c' }}",{% endif %}
-          {% if page.event_end_date %}"endDate": "{{ page.event_end_date|date:'c' }}",{% endif %}
-          "eventStatus": "https://schema.org/EventScheduled",
-          "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
-          "location": {
-            "@type": "Place",
-            "name": "{{ page.event_location|default:'Amsterdam'|escapejs }}",
-            "address": {
-              "@type": "PostalAddress",
-              "addressLocality": "{{ page.event_location|default:'Amsterdam'|escapejs }}",
-              "addressCountry": "NL"
-            }
-          },
-          "image": [
-            "{% if page and page.og_image %}{% image page.og_image original as i %}{{ request.scheme }}://{{ request.get_host }}{{ i.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}{% endif %}"
-          ],
-          "description": "{{ page.search_description|default:''|escapejs }}"
-        {% else %}
+        {
+          "@context": "https://schema.org",
           "@type": "WebSite",
           "name": "{{ request.site.site_name|default:'DXP Odin'|escapejs }}",
           "url": "{{ request.scheme }}://{{ request.get_host }}"
-        {% endif %}
-      }
+        }
       </script>
     {% endblock %}
 
-    {# ---- PWA / Icons ---- #}
+    {# ---- Assets & Performance ---- #}
     <meta name="theme-color" content="#020617" />
+
+    {# Favicon Strategy: ICO for legacy, SVG for modern, PNGs for fallbacks #}
     <link rel="icon" href="{% static 'icons/favicon.ico' %}" sizes="any" />
     <link rel="icon" href="{% static 'icons/icon.svg' %}" type="image/svg+xml" />
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32x32.png' %}" />
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/favicon-16x16.png' %}" />
     <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}" />
     <link rel="manifest" href="{% static 'site.webmanifest' %}" />
 
-    {# ---- Performance & Fonts ---- #}
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
     <link rel="preconnect" href="https://player.cloudinary.com" crossorigin />
 
-    {# Preload Fonts #}
-    <link rel="preload" href="{% static 'fonts/Satoshi-Regular.woff2' %}" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="{% static 'fonts/ClashDisplay-Bold.woff2' %}" as="font" type="font/woff2" crossorigin />
+    <link
+      rel="preload"
+      href="{% static 'fonts/Satoshi-Regular.woff2' %}"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="{% static 'fonts/ClashDisplay-Bold.woff2' %}"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
 
-    {# CSS #}
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}" />
 
-    {# Hide Alpine.js elements before load #}
     <style>
-      [x-cloak] { display: none !important; }
+      [x-cloak] {
+        display: none !important;
+      }
     </style>
 
-    {# JS #}
+    {# Force manual scroll restoration to prevent stuck header states #}
+    <script>
+      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    </script>
+
     <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
     <script src="{% static 'dist/alpine.js' %}" defer></script>
 
     {% block extra_head %}{% endblock %}
   </head>
 
-  <body class="flex flex-col h-full min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-emerald-500/30 overflow-x-hidden">
-    {# Skip link #}
-    <a
-      href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-white focus:px-3 focus:py-2 focus:text-slate-950"
-    >
-      Skip to content
-    </a>
-
+  <body
+    class="flex flex-col h-full min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-emerald-500/30 overflow-x-hidden"
+  >
+    {# 1. HEADER (Fixed position, sits on top) #}
     {% include "partials/header.html" %}
 
+    {# 2. MAIN CONTENT (Starts at top:0) #}
+    {# The relative class allows child absolute elements to position correctly, but it starts BEHIND the header #}
     <main id="main-content" class="grow w-full relative z-0" role="main">
       {% block content %}{% endblock %}
     </main>
@@ -145,7 +166,9 @@
     {% include "partials/footer.html" %}
 
     <noscript>
-      <div class="p-4 text-center text-sm text-slate-200 bg-slate-900 border-t border-white/10">
+      <div
+        class="p-4 text-center text-sm text-slate-200 bg-slate-900 border-t border-white/10"
+      >
         This site works best with JavaScript enabled.
       </div>
     </noscript>

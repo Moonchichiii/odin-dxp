@@ -52,14 +52,11 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "corsheaders",
-
     # Frontend/Utils
     "django_htmx",
-
     # Cloudinary
     "cloudinary_storage",
     "cloudinary",
-
     # Wagtail CMS Core
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -73,7 +70,6 @@ THIRD_PARTY_APPS = [
     "wagtail.search",
     "wagtail.admin",
     "wagtail",
-
     # Wagtail Dependencies
     "taggit",
     "modelcluster",
@@ -186,15 +182,15 @@ USE_TZ = True
 # ---------------------------------------------------------------------------
 
 # Static files (CSS, JavaScript, Images)
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 # Cloudinary Configuration
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
-    'API_KEY': config('CLOUDINARY_API_KEY', default=''),
-    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+    "CLOUD_NAME": config("CLOUDINARY_CLOUD_NAME", default=""),
+    "API_KEY": config("CLOUDINARY_API_KEY", default=""),
+    "API_SECRET": config("CLOUDINARY_API_SECRET", default=""),
 }
 
 # Modern Storage API

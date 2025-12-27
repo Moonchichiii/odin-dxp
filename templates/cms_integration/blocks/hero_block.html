@@ -3,16 +3,17 @@
 
 <section
     aria-label="Hero"
-    class="relative w-full overflow-hidden bg-slate-950 h-[100svh] min-h-[600px] flex items-center justify-center"
+    class="hero-section relative w-full overflow-hidden bg-slate-950 h-[100svh] min-h-[600px] flex items-center justify-center"
     x-data="{ scroll: 0 }"
     @scroll.window="scroll = window.pageYOffset"
 >
 
-    {# ================= BACKGROUND MEDIA (Parallax Layer) ================= #}
+    {# ================= BACKGROUND MEDIA (Starts at top: 0) ================= #}
     <div
         class="absolute inset-0 z-0 select-none scale-110 origin-top will-change-transform"
         :style="'transform: translate3d(0, ' + (scroll * 0.4) + 'px, 0)'"
     >
+        {# 1. Cloudinary Video #}
         {% if self.video_public_id %}
             <video
                 class="absolute inset-0 h-full w-full object-cover object-[center_20%] opacity-70"
@@ -22,33 +23,17 @@
                 <source src="{% cld_video self.video_public_id width=1080 %}" type="video/mp4" />
             </video>
         {% elif self.video_upload %}
-            <video
+             <video
                 class="absolute inset-0 h-full w-full object-cover object-[center_20%] opacity-70"
                 autoplay muted loop playsinline preload="metadata" aria-hidden="true"
                 {% if self.poster_upload %}poster="{{ self.poster_upload.file.url }}"{% endif %}
             >
                 <source src="{{ self.video_upload.url }}" type="video/mp4" />
             </video>
-        {% elif self.poster_public_id %}
-            <img
-                src="{% cld_img self.poster_public_id width=1080 %}"
-                class="absolute inset-0 h-full w-full object-cover object-[center_20%] opacity-70"
-                alt=""
-                aria-hidden="true"
-                loading="eager"
-                decoding="async"
-            />
         {% elif self.poster_upload %}
-            <img
-                src="{{ self.poster_upload.file.url }}"
-                class="absolute inset-0 h-full w-full object-cover object-[center_20%] opacity-70"
-                alt=""
-                aria-hidden="true"
-                loading="eager"
-                decoding="async"
-            />
+            <img src="{{ self.poster_upload.file.url }}" class="absolute inset-0 h-full w-full object-cover opacity-70" alt="" />
         {% else %}
-            {# --- Cloudinary iframe fallback --- #}
+            {# Fallback Iframe #}
             <div class="absolute inset-0 z-0 opacity-60">
                 <iframe
                     title="Hero background video"
@@ -62,18 +47,18 @@
         {% endif %}
     </div>
 
-    {# ================= GRADIENT OVERLAYS (z-10) ================= #}
+    {# ================= GRADIENT OVERLAYS (Starts at top: 0) ================= #}
     <div class="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-slate-950/90 to-transparent z-10 pointer-events-none"></div>
     <div class="absolute bottom-0 inset-x-0 h-64 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent z-10 pointer-events-none"></div>
     <div class="absolute inset-0 bg-slate-950/30 z-10 pointer-events-none"></div>
 
-    {# ================= CONTENT CONTAINER (z-30) ================= #}
+    {# ================= CONTENT CONTAINER ================= #}
     <div
-        class="relative z-30 w-full max-w-7xl mx-auto px-6 pt-20 flex flex-col items-center text-center will-change-transform"
+        class="relative z-30 w-full max-w-7xl mx-auto px-6 pt-32 lg:pt-40 flex flex-col items-center text-center will-change-transform"
         :style="'transform: translate3d(0, -' + (scroll * 0.1) + 'px, 0); opacity: ' + (1 - scroll/500)"
     >
 
-        {# --- 1. Extra Images (Logo/Badge) --- #}
+        {# --- 1. Extra Images --- #}
         {% if self.extra_images %}
             <div class="mb-8 sm:mb-10 flex justify-center gap-6 animate-fade-in-up">
                 {% for img in self.extra_images %}
@@ -81,7 +66,6 @@
                         src="{{ img.file.url }}"
                         alt="{{ img.title|default:'' }}"
                         class="h-24 sm:h-32 w-auto object-contain drop-shadow-2xl"
-                        loading="eager"
                     />
                 {% endfor %}
             </div>
@@ -105,22 +89,11 @@
             </h1>
         </div>
 
-        {# --- 3. Description --- #}
-        {% if self.description %}
-            <div class="mt-6 sm:mt-8 max-w-2xl mx-auto">
-                <div class="text-base sm:text-lg text-slate-200/90 leading-relaxed font-medium">
-                    {{ self.description }}
-                </div>
-            </div>
-        {% endif %}
-
-        {# --- 4. CTA Buttons --- #}
+        {# --- 3. CTA Buttons --- #}
         {% if self.cta_buttons %}
             <div class="mt-10 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
                 {% for item in self.cta_buttons %}
                     {% with cta=item.value|default:item %}
-
-                        {# SAFETY CHECK: Only show button if Page OR Url is set #}
                         {% if cta.page or cta.url %}
                             <a href="{% if cta.page %}{{ cta.page.url }}{% else %}{{ cta.url }}{% endif %}"
                                class="
@@ -142,7 +115,6 @@
                                 {% endif %}
                             </a>
                         {% endif %}
-
                     {% endwith %}
                 {% endfor %}
             </div>
@@ -150,11 +122,8 @@
 
     </div>
 
-    {# ================= SCROLL DOWN INDICATOR ================= #}
-    <div
-        class="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 pointer-events-none animate-bounce"
-        :style="'opacity: ' + (1 - scroll/200)"
-    >
+    {# --- Scroll Indicator --- #}
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 pointer-events-none animate-bounce">
         <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
     </div>
 
