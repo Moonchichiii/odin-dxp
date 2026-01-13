@@ -12,12 +12,11 @@ urlpatterns = [
     path("django-admin/", admin.site.urls),
     path("admin/", include(wagtailadmin_urls)),
     path("documents/", include(wagtaildocs_urls)),
-    # Internal Django-only endpoints (HTMX, debug, tools)
-    path("internal/", include(("apps.core.urls", "core"), namespace="core")),
-    # Wagtail page tree (HomePage etc.)
+    # ✅ Put your HTMX endpoints under /hx/
+    path("hx/", include("apps.cms_integration.urls")),
+    # ✅ Wagtail owns /
     path("", include(wagtail_urls)),
 ]
-
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)  # type: ignore
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)  # type: ignore

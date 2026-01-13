@@ -1,11 +1,20 @@
-<section class="bg-slate-950 py-20 border-b border-white/5">
-    <div class="mx-auto max-w-3xl px-6 text-center">
-        {% if self.heading %}
-            <h2 class="font-display text-3xl font-bold text-white mb-8">{{ self.heading }}</h2>
-        {% endif %}
+<section class="bg-odin-bg py-24 md:py-32 relative overflow-hidden">
+    {# Background aesthetic blobs #}
+    <div class="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-primary/5 blur-[100px] rounded-full pointer-events-none"></div>
+    <div class="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-cyan-500/5 blur-[100px] rounded-full pointer-events-none"></div>
 
-        <div class="prose prose-invert prose-lg mx-auto prose-p:text-slate-300 prose-a:text-emerald-400">
-            {{ self.text }}
+    <div class="mx-auto max-w-4xl px-6 relative z-10">
+        <div class="bg-odin-surface border border-odin-border rounded-3xl p-8 md:p-12 lg:p-16 backdrop-blur-sm shadow-2xl">
+            {% if self.heading %}
+                <h2 class="font-display text-3xl md:text-5xl font-bold text-center text-white mb-10 leading-tight text-balance">
+                    {{ self.heading }}
+                </h2>
+            {% endif %}
+
+            {# Cleaned up prose classes (styling is now handled by input.css) #}
+            <div class="prose prose-lg prose-invert mx-auto text-center">
+                {{ self.text }}
+            </div>
         </div>
     </div>
 </section>

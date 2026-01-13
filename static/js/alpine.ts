@@ -1,55 +1,104 @@
+import collapse from "@alpinejs/collapse";
 import Alpine from "alpinejs";
+
+Alpine.plugin(collapse);
 
 declare global {
   interface Window {
     Alpine: typeof Alpine;
   }
 }
-
 window.Alpine = Alpine;
 
-function initHeaderLogic() {
-  const header = document.getElementById("site-header");
-  const hero = document.querySelector(".hero-section");
+const HEADER_ID = "site-header";
+const HERO_SELECTOR = ".hero-section";
+const SOLID_AT_PX = 12;
 
+// Avoid double-binding (HTMX + BFCache + hot reload)
+let bound = false;
+
+function getHeader(): HTMLElement | null {
+  return document.getElementById(HEADER_ID) as HTMLElement | null;
+}
+
+function hasHero(): boolean {
+  return Boolean(document.querySelector(HERO_SELECTOR));
+}
+
+function menuOpen(header: HTMLElement): boolean {
+  return header.getAttribute("data-menu-open") === "true";
+}
+
+function setSolid(header: HTMLElement, solid: boolean): void {
+  header.setAttribute("data-solid", solid ? "true" : "false");
+}
+
+function applyHeaderState(): void {
+  const header = getHeader();
   if (!header) return;
 
-  // 1. HERO DETECTION
-  if (hero) {
-    header.setAttribute("data-has-hero", "true");
-  } else {
-    // If no hero, clean up attributes so it defaults to solid HTML classes
-    header.removeAttribute("data-has-hero");
-    header.removeAttribute("data-solid");
-    return; // Stop here, no scroll logic needed for non-hero pages
+  const hero = hasHero();
+  header.toggleAttribute("data-has-hero", hero);
+
+  // If no hero on this page, header should be solid always.
+  if (!hero) {
+    setSolid(header, true);
+    return;
   }
 
-  // 2. SCROLL LOGIC (Only runs if hero exists)
-  const applyScrollState = () => {
-    // Re-check hero existence in case of dynamic removal
-    if (!document.querySelector(".hero-section")) return;
+  // If mobile menu is open, force solid for legibility.
+  if (menuOpen(header)) {
+    setSolid(header, true);
+    return;
+  }
 
-    const isMobileMenuOpen = document.body.style.overflow === "hidden";
-    const isScrolled = window.scrollY > 20;
+  // Correct, reliable scroll source:
+  const y = window.scrollY || 0;
 
-    const shouldBeSolid = isScrolled || isMobileMenuOpen;
+  // Desired behavior:
+  // - At top of hero (y <= SOLID_AT_PX) => NOT solid
+  // - After scrolling down => solid
+  setSolid(header, y > SOLID_AT_PX);
+}
 
-    // Only touch DOM if changed
-    if (header.getAttribute("data-solid") !== String(shouldBeSolid)) {
-      header.setAttribute("data-solid", shouldBeSolid ? "true" : "false");
+function bindHeader(): void {
+  if (bound) return;
+  bound = true;
+
+  const prefersReducedMotion =
+    window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+
+  let ticking = false;
+
+  const onScroll = () => {
+    if (prefersReducedMotion) {
+      applyHeaderState();
+      return;
     }
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      applyHeaderState();
+      ticking = false;
+    });
   };
 
-  applyScrollState();
-  window.addEventListener("scroll", applyScrollState, { passive: true });
-  window.addEventListener("resize", applyScrollState, { passive: true });
+  // Run immediately + again on next paint (mobile viewport settling)
+  applyHeaderState();
+  requestAnimationFrame(applyHeaderState);
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", applyHeaderState, { passive: true });
+
+  // BFCache restore (Safari/iOS)
+  window.addEventListener("pageshow", () => requestAnimationFrame(applyHeaderState), { passive: true });
+
+  // HTMX navigations / swaps
+  document.body.addEventListener("htmx:afterSwap", () => requestAnimationFrame(applyHeaderState));
+  document.body.addEventListener("htmx:afterSettle", () => requestAnimationFrame(applyHeaderState));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   Alpine.start();
-  initHeaderLogic();
-});
-
-document.addEventListener("htmx:afterSwap", () => {
-  initHeaderLogic();
+  bindHeader();
 });

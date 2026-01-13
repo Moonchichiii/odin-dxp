@@ -82,9 +82,6 @@ LOCAL_APPS = [
     "apps.events",
     "apps.campaigns",
     "apps.cms_integration",
-    "apps.integrations",
-    "apps.api",
-    "apps.ui",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

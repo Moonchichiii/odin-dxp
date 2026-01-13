@@ -1,0 +1,7 @@
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  {% for sponsor in partners %}
+    {% include "partials/cards/sponsor_card.html" with sponsor=sponsor %}
+  {% empty %}
+    <p class="text-text-muted">No sponsors yet.</p>
+  {% endfor %}
+</div>

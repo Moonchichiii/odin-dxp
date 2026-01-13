@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Any, cast
+from typing import Any
 
 from django.forms import Media
 from django.http import HttpRequest
@@ -13,18 +13,12 @@ from django.utils.html import format_html
 from django.utils.safestring import SafeString
 from wagtail import hooks
 from wagtail.admin.menu import MenuItem
-
-from apps.cms_integration.models import HomePage
+from wagtail.models import Site
 
 logger = logging.getLogger(__name__)
 
 
 def safe_reverse(viewname: str, *args: Any, **kwargs: Any) -> str:
-    """
-    Reverse helper that never crashes the admin UI.
-
-    We log at DEBUG level so you can enable it when needed.
-    """
     try:
         return reverse(viewname, args=args, kwargs=kwargs)
     except NoReverseMatch as e:
@@ -33,25 +27,35 @@ def safe_reverse(viewname: str, *args: Any, **kwargs: Any) -> str:
 
 
 def snippet_list_url(app_label: str, model_name: str) -> str:
-    """
-    Wagtail snippet URLs vary by version / configuration.
-
-    Try:
-      1) Namespaced URL: wagtailsnippets_{app}_{model}:list  (newer Wagtail)
-      2) Older pattern: wagtailsnippets:list (app, model)
-    """
-    # Newer Wagtail pattern
     url = safe_reverse(f"wagtailsnippets_{app_label}_{model_name}:list")
     if url:
         return url
 
-    # Older Wagtail pattern
     url = safe_reverse("wagtailsnippets:list", app_label, model_name)
     if url:
         return url
 
-    # Last resort: snippets index (so buttons still appear, just less specific)
     return safe_reverse("wagtailsnippets:index") or ""
+
+
+def get_site_home_edit_url(request: HttpRequest) -> str:
+    try:
+        site = Site.find_for_request(request)
+        if not site or not site.root_page:
+            return ""
+
+        root = site.root_page.specific
+
+        # Import lazily to avoid any chance of early app-loading issues.
+        from apps.cms_integration.models import HomePage  # noqa: WPS433
+
+        if not isinstance(root, HomePage):
+            return ""
+
+        return safe_reverse("wagtailadmin_pages:edit", root.id)
+    except Exception:
+        logger.exception("Failed to resolve Site homepage edit URL")
+        return ""
 
 
 @hooks.register("insert_global_admin_css")
@@ -83,7 +87,12 @@ def register_sponsors_menu_item() -> MenuItem:
 
 @hooks.register("construct_main_menu")
 def clean_sidebar_menu(_request: Any, menu_items: list[Any]) -> None:
-    hidden = {"help", "reports", "snippets"}
+    hidden = {"help", "reports"}
+
+    # Hide "snippets" only if our custom snippet list URLs resolve.
+    if snippet_list_url("cms_integration", "speaker") and snippet_list_url("cms_integration", "partner"):
+        hidden.add("snippets")
+
     menu_items[:] = [item for item in menu_items if getattr(item, "name", "") not in hidden]
 
 
@@ -98,7 +107,6 @@ class ClientQuickActionsPanel:
     def render_html(self, parent_context: dict[str, Any]) -> SafeString:
         request: HttpRequest = parent_context["request"]
 
-        # Settings
         settings_index = safe_reverse("wagtailsettings:index")
         header_settings_url = (
             safe_reverse("wagtailsettings:edit", "cms_integration", "headersettings") or settings_index
@@ -107,21 +115,11 @@ class ClientQuickActionsPanel:
             safe_reverse("wagtailsettings:edit", "cms_integration", "footersettings") or settings_index
         )
 
-        # Snippets (robust)
         speakers_url = snippet_list_url("cms_integration", "speaker")
         partners_url = snippet_list_url("cms_integration", "partner")
 
-        # Pages
         pages_url = safe_reverse("wagtailadmin_explore_root")
-
-        # Home page edit
-        home_edit_url = ""
-        try:
-            homepage = cast(Any, HomePage.objects).live().first()
-            if homepage:
-                home_edit_url = safe_reverse("wagtailadmin_pages:edit", homepage.id)
-        except Exception:
-            home_edit_url = ""
+        home_edit_url = get_site_home_edit_url(request)
 
         context = {
             "home_edit_url": home_edit_url,

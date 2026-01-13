@@ -1,58 +1,77 @@
 {% load static wagtailsettings_tags %}
 {% get_settings use_default_site=True %}
 
-{# Access our specific model from the settings object #}
 {% with footer=settings.cms_integration.FooterSettings %}
 
-<footer class="bg-slate-950 border-t border-white/5">
-    <div class="mx-auto max-w-7xl px-6 py-14">
-        <div class="grid gap-10 md:grid-cols-3">
+<footer class="bg-odin-bg border-t border-odin-border pt-20 pb-10">
+    <div class="mx-auto max-w-7xl px-6">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
 
-            <!-- Brand & Description -->
-            <div>
-                <h2 class="font-display text-xl font-bold text-white">DXP Odin</h2>
-                <p class="mt-3 text-sm leading-relaxed text-slate-300">
+            <!-- Brand Column (Span 4) -->
+            <div class="md:col-span-5 lg:col-span-4">
+                <a href="/" class="inline-block mb-6">
+                   <span class="font-display text-2xl font-bold tracking-tight text-white">
+                      DXP <span class="text-primary">Odin</span>
+                    </span>
+                </a>
+                <p class="text-text-muted text-sm leading-relaxed max-w-sm mb-6">
                     {{ footer.footer_description }}
                 </p>
-                <p class="mt-4 text-xs text-slate-400">
-                    © {% now "Y" %} DXP Odin. All rights reserved.
-                </p>
+                <!-- Social placeholder or extra info -->
+                <div class="flex gap-4">
+                    <!-- Add social icons here if needed -->
+                </div>
             </div>
 
-            <!-- Dynamic Columns -->
-            <nav class="grid grid-cols-2 gap-6 text-sm">
+            <!-- Spacer -->
+            <div class="hidden md:block md:col-span-1 lg:col-span-2"></div>
 
-                <!-- Column 1 -->
-                <div class="space-y-3">
-                    <p class="font-mono text-xs uppercase tracking-wider text-slate-400">
-                        {{ footer.footer_col_1_title }}
-                    </p>
+            <!-- Links Column 1 (Span 3) -->
+            <div class="md:col-span-3 lg:col-span-3">
+                <h3 class="font-mono text-xs font-bold uppercase tracking-widest text-primary mb-6">
+                    {{ footer.footer_col_1_title }}
+                </h3>
+                <ul class="space-y-4">
                     {% for block in footer.footer_col_1_links %}
                          {% with item=block.value %}
-                         <a class="block text-slate-300 hover:text-white transition-colors"
-                            href="{{ item.page.url|default:item.url }}">
-                            {{ item.label }}
-                         </a>
+                         <li>
+                             <a class="text-sm text-text-muted hover:text-white transition-colors flex items-center gap-2 group"
+                                href="{{ item.page.url|default:item.url }}">
+                                {{ item.label }}
+                                <span class="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-primary">→</span>
+                             </a>
+                         </li>
                          {% endwith %}
                     {% endfor %}
-                </div>
+                </ul>
+            </div>
 
-                <!-- Column 2 -->
-                <div class="space-y-3">
-                    <p class="font-mono text-xs uppercase tracking-wider text-slate-400">
-                        {{ footer.footer_col_2_title }}
-                    </p>
+            <!-- Links Column 2 (Span 3) -->
+            <div class="md:col-span-3 lg:col-span-3">
+                 <h3 class="font-mono text-xs font-bold uppercase tracking-widest text-primary mb-6">
+                    {{ footer.footer_col_2_title }}
+                </h3>
+                <ul class="space-y-4">
                     {% for block in footer.footer_col_2_links %}
                          {% with item=block.value %}
-                         <a class="block text-slate-300 hover:text-white transition-colors"
-                            href="{{ item.page.url|default:item.url }}">
-                            {{ item.label }}
-                         </a>
+                         <li>
+                             <a class="text-sm text-text-muted hover:text-white transition-colors group"
+                                href="{{ item.page.url|default:item.url }}">
+                                {{ item.label }}
+                             </a>
+                         </li>
                          {% endwith %}
                     {% endfor %}
-                </div>
-            </nav>
+                </ul>
+            </div>
+        </div>
 
+        <div class="border-t border-odin-border pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-text-muted/60">
+            <p>© {% now "Y" %} DXP Odin. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+            </div>
         </div>
     </div>
 </footer>

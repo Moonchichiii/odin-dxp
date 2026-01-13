@@ -1,26 +1,24 @@
 {% load static wagtailcore_tags wagtailsettings_tags wagtailimages_tags %}
 {% get_settings use_default_site=True %}
-
 {% with header=settings.cms_integration.HeaderSettings %}
 
 <header
   id="site-header"
-  class="site-header fixed top-0 left-0 w-full z-[100] border-b transition-colors duration-300 ease-in-out
-         bg-[#020617]/90 backdrop-blur-xl border-white/5 shadow-2xl"
+  class="fixed top-0 left-0 w-full z-50 border-b border-transparent transition-all duration-300 ease-in-out"
   x-data="{
     mobileMenuOpen: false,
-    toggle() { this.mobileMenuOpen = !this.mobileMenuOpen },
-    close() { this.mobileMenuOpen = false }
+    toggle() { this.mobileMenuOpen = !this.mobileMenuOpen; },
+    close() { this.mobileMenuOpen = false; }
   }"
-  x-init="
-    $watch('mobileMenuOpen', (open) => {
-      document.body.style.overflow = open ? 'hidden' : '';
-    })
-  "
+  x-init="$watch('mobileMenuOpen', (open) => { document.body.style.overflow = open ? 'hidden' : ''; })"
   @keydown.escape.window="close()"
+  x-bind:data-menu-open="mobileMenuOpen ? 'true' : 'false'"
+  data-solid="false"
 >
-  <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6">
-    <a href="/" class="group flex items-center gap-3 z-50 relative">
+  <div class="mx-auto flex h-20 max-w-7xl items-center justify-between px-6">
+
+    {# --- LOGO --- #}
+    <a href="/" class="group relative z-10 flex items-center gap-3">
       {% if header.logo_image %}
         {% image header.logo_image original as logo %}
         <img
@@ -34,27 +32,35 @@
         />
       {% else %}
         <span class="font-display text-lg md:text-xl font-bold tracking-tight text-white">
-          DXP <span class="text-emerald-400">Odin</span>
+          DXP <span class="text-primary">Odin</span>
         </span>
       {% endif %}
     </a>
 
-    <nav class="hidden lg:flex items-center gap-8">
+    {# --- DESKTOP NAVIGATION --- #}
+    <nav class="hidden lg:flex items-center gap-8" aria-label="Primary navigation">
       {% for block in header.primary_navigation %}
         {% with item=block.value %}
           {% with href=item.page.url|default:item.url %}
             {% if item.children %}
               <div class="relative group">
-                <a href="{{ href|default:'#' }}"
-                   class="relative text-sm font-medium tracking-wide text-slate-300 hover:text-white transition-colors py-2 inline-flex items-center gap-2">
+                <a
+                  href="{{ href|default:'#' }}"
+                  class="relative inline-flex items-center gap-1 py-2 text-sm font-medium tracking-wide text-slate-200 transition-colors hover:text-white"
+                >
                   {{ item.label }}
-                  <span class="text-slate-400 group-hover:text-white transition-colors">▾</span>
+                  <svg class="h-4 w-4 text-slate-200 transition-transform duration-300 group-hover:rotate-180 group-hover:text-primary" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                  </svg>
                 </a>
-                <div class="absolute left-0 top-full mt-2 hidden group-hover:block pt-2">
-                  <div class="min-w-56 rounded-xl border border-white/10 bg-[#020617]/95 backdrop-blur-xl shadow-2xl p-2">
+
+                <div class="absolute left-0 top-full pt-4 hidden group-hover:block">
+                  <div class="min-w-56 rounded-xl border border-odin-border bg-odin-bg/95 backdrop-blur-xl shadow-2xl p-2">
                     {% for child in item.children %}
-                      <a href="{{ child.page.url|default:child.url }}"
-                         class="block rounded-lg px-3 py-2 text-sm text-slate-200 hover:bg-white/5 hover:text-white transition-colors">
+                      <a
+                        href="{{ child.page.url|default:child.url }}"
+                        class="block rounded-lg px-3 py-2 text-sm text-text-muted transition-colors hover:bg-white/5 hover:text-white"
+                      >
                         {{ child.label }}
                       </a>
                     {% endfor %}
@@ -62,10 +68,12 @@
                 </div>
               </div>
             {% else %}
-              <a href="{{ href }}"
-                 class="relative text-sm font-medium tracking-wide text-slate-300 hover:text-white transition-colors py-2 group">
+              <a
+                href="{{ href }}"
+                class="group relative py-2 text-sm font-medium tracking-wide text-slate-200 transition-colors hover:text-white"
+              >
                 {{ item.label }}
-                <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full"></span>
+                <span class="absolute bottom-0 left-0 h-0.5 w-0 bg-primary transition-all duration-300 group-hover:w-full"></span>
               </a>
             {% endif %}
           {% endwith %}
@@ -73,62 +81,66 @@
       {% endfor %}
     </nav>
 
+    {# --- CTA BUTTONS --- #}
     <div class="hidden lg:flex items-center gap-3">
       {% for block in header.cta_buttons %}
         {% with cta=block.value %}
-          <a href="{{ cta.page.url|default:cta.url }}"
-             class="
-               {% if cta.style == 'primary' %}
-                 inline-flex items-center justify-center rounded-full bg-emerald-500 px-6 py-2.5 text-sm font-bold text-white transition-transform hover:scale-105
-               {% elif cta.style == 'secondary' %}
-                 inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-2.5 text-sm font-bold text-white hover:bg-white/5 transition-colors
-               {% else %}
-                 inline-flex items-center justify-center px-3 py-2 text-sm text-slate-200 hover:text-white font-semibold transition-colors
-               {% endif %}
-             ">
+          <a
+            href="{{ cta.page.url|default:cta.url }}"
+            class="
+              {% if cta.style == 'primary' %}
+                inline-flex items-center justify-center rounded-full bg-primary text-odin-bg px-6 py-2.5 text-sm font-bold transition-transform hover:scale-105 hover:bg-white
+              {% elif cta.style == 'secondary' %}
+                inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/10 hover:border-white
+              {% else %}
+                inline-flex items-center justify-center px-3 py-2 text-sm font-semibold text-text-muted transition-colors hover:text-white
+              {% endif %}
+            "
+          >
             {{ cta.label }}
           </a>
         {% endwith %}
       {% endfor %}
     </div>
 
-    <button @click="toggle()" class="lg:hidden relative z-50 text-white p-2">
-      <svg x-show="!mobileMenuOpen" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-      </svg>
-      <svg x-show="mobileMenuOpen" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-      </svg>
+    {# --- MOBILE TOGGLE --- #}
+    <button
+      type="button"
+      @click="toggle()"
+      class="lg:hidden relative z-60 p-2 text-white rounded-md"
+      aria-label="Toggle navigation"
+      aria-controls="mobile-nav"
+      x-bind:aria-expanded="mobileMenuOpen.toString()"
+    >
+      <svg x-show="!mobileMenuOpen" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      <svg x-show="mobileMenuOpen" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
     </button>
   </div>
 
+  {# --- MOBILE MENU --- #}
   <div
+    id="mobile-nav"
     x-show="mobileMenuOpen"
     x-cloak
-    style="display: none;"
     x-transition:enter="transition ease-out duration-200"
-    x-transition:enter-start="opacity-0 -translate-y-5"
-    x-transition:enter-end="opacity-100 translate-y-0"
+    x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100"
     x-transition:leave="transition ease-in duration-150"
-    x-transition:leave-start="opacity-100 translate-y-0"
-    x-transition:leave-end="opacity-0 -translate-y-5"
-    class="fixed inset-0 z-40 bg-[#020617] pt-28 px-6 lg:hidden flex flex-col h-screen overflow-y-auto"
+    x-transition:leave-start="opacity-100"
+    x-transition:leave-end="opacity-0"
+    class="fixed inset-0 z-40 bg-odin-bg pt-28 px-6 lg:hidden flex flex-col h-screen overflow-y-auto"
   >
-    <nav class="flex flex-col gap-6 text-center pb-12">
+    <nav class="flex flex-col gap-8 text-center pb-12" aria-label="Mobile navigation">
       {% for block in header.primary_navigation %}
         {% with item=block.value %}
           <div class="flex flex-col items-center">
-            <a href="{{ item.page.url|default:item.url }}"
-               @click="close()"
-               class="text-2xl font-display font-bold text-white hover:text-emerald-400 transition-colors">
+            <a href="{{ item.page.url|default:item.url }}" @click="close()" class="text-2xl font-display font-bold text-white hover:text-primary transition-colors">
               {{ item.label }}
             </a>
             {% if item.children %}
-              <div class="mt-3 flex flex-col gap-3">
+              <div class="mt-4 flex flex-col gap-3 border-l-2 border-odin-border pl-4">
                 {% for child in item.children %}
-                  <a href="{{ child.page.url|default:child.url }}"
-                     @click="close()"
-                     class="text-base font-semibold text-slate-400 hover:text-white transition-colors">
+                  <a href="{{ child.page.url|default:child.url }}" @click="close()" class="text-lg font-semibold text-text-muted hover:text-white">
                     {{ child.label }}
                   </a>
                 {% endfor %}
@@ -138,20 +150,22 @@
         {% endwith %}
       {% endfor %}
 
-      <div class="mt-6 flex flex-col gap-3 px-4">
+      {# CTA mobile button #}
+       <div class="mt-8 flex flex-col gap-4 px-6">
         {% for block in header.cta_buttons %}
           {% with cta=block.value %}
-            <a href="{{ cta.page.url|default:cta.url }}"
+            <a
+               href="{{ cta.page.url|default:cta.url }}"
                @click="close()"
                class="
+                 block mx-auto w-full max-w-xs rounded-full py-4 text-center text-xl font-bold transition-transform active:scale-95
                  {% if cta.style == 'primary' %}
-                   mx-auto w-full max-w-xs rounded-full bg-emerald-500 py-4 text-center text-white font-bold transition-transform hover:scale-105
-                 {% elif cta.style == 'secondary' %}
-                   mx-auto w-full max-w-xs rounded-full border border-white/15 py-4 text-center text-white font-bold hover:bg-white/5 transition-colors
+                   bg-primary text-odin-bg hover:bg-white shadow-xl shadow-primary/20
                  {% else %}
-                   mx-auto w-full max-w-xs py-3 text-center text-slate-200 hover:text-white font-semibold transition-colors
+                   border border-white/20 text-white hover:bg-white/10 hover:border-white
                  {% endif %}
-               ">
+               "
+            >
               {{ cta.label }}
             </a>
           {% endwith %}

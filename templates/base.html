@@ -1,20 +1,14 @@
 {% load static wagtailimages_tags %}
 <!doctype html>
-<html
-  lang="{% block html_lang %}en{% endblock %}"
-  class="h-full scroll-smooth antialiased"
->
+<html lang="{% block html_lang %}en{% endblock %}" class="h-full scroll-smooth antialiased">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark light" />
 
-    {# ---- Primary SEO ---- #}
+    {# --- RESTORED TITLE LOGIC --- #}
     <title>
       {% block title %}
         {% if page and page.seo_title %}
@@ -30,68 +24,36 @@
       {% endblock %}
     </title>
 
+    {# --- RESTORED META TAGS --- #}
     <meta
       name="description"
       content="{% block meta_description %}{% if page %}{{ page.search_description|default:'Event Intelligence Platform by DXP Odin.' }}{% else %}Event Intelligence Platform by DXP Odin.{% endif %}{% endblock %}"
     />
 
-    <meta
-      name="robots"
-      content="{% block robots %}index,follow,max-image-preview:large{% endblock %}"
-    />
-    <link
-      rel="canonical"
-      href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}"
-    />
+    <meta name="robots" content="{% block robots %}index,follow,max-image-preview:large{% endblock %}" />
+    <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}" />
 
-    {# ---- Open Graph ---- #}
-    <meta
-      property="og:site_name"
-      content="{% block og_site_name %}{{ request.site.site_name|default:"DXP Odin" }}{% endblock %}"
-    />
-    <meta
-      property="og:type"
-      content="{% block og_type %}website{% endblock %}"
-    />
-    <meta
-      property="og:title"
-      content="{% block og_title %}{% if page and page.seo_title %}{{ page.seo_title }}{% elif page and page.title %}{{ page.title }}{% else %}DXP Odin{% endif %}{% endblock %}"
-    />
-    <meta
-      property="og:description"
-      content="{% block og_description %}{% if page %}{{ page.search_description|default:'' }}{% else %}Event Intelligence Platform by DXP Odin.{% endif %}{% endblock %}"
-    />
-    <meta
-      property="og:url"
-      content="{% block og_url %}{% if page and page.full_url %}{{ page.full_url }}{% else %}{{ request.build_absolute_uri }}{% endif %}{% endblock %}"
-    />
+    <meta property="og:site_name" content="{% block og_site_name %}{{ request.site.site_name|default:"DXP Odin" }}{% endblock %}" />
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+    <meta property="og:title" content="{% block og_title %}{% if page and page.seo_title %}{{ page.seo_title }}{% elif page and page.title %}{{ page.title }}{% else %}DXP Odin{% endif %}{% endblock %}" />
+    <meta property="og:description" content="{% block og_description %}{% if page %}{{ page.search_description|default:'' }}{% else %}Event Intelligence Platform by DXP Odin.{% endif %}{% endblock %}" />
+    <meta property="og:url" content="{% block og_url %}{% if page and page.full_url %}{{ page.full_url }}{% else %}{{ request.build_absolute_uri }}{% endif %}{% endblock %}" />
 
-    {# OG Image #}
     {% block og_image %}
       {% if page and page.og_image %}
         {% image page.og_image original as og_img %}
-        <meta
-          property="og:image"
-          content="{{ request.scheme }}://{{ request.get_host }}{{ og_img.url }}"
-        />
+        <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ og_img.url }}" />
         <meta property="og:image:width" content="{{ og_img.width }}" />
         <meta property="og:image:height" content="{{ og_img.height }}" />
       {% else %}
-        <meta
-          property="og:image"
-          content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}"
-        />
+        <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'img/og-default.jpg' %}" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
       {% endif %}
     {% endblock %}
 
-    <meta
-      name="twitter:card"
-      content="{% block twitter_card %}summary_large_image{% endblock %}"
-    />
+    <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}" />
 
-    {# ---- JSON-LD ---- #}
     {% block json_ld %}
       <script type="application/ld+json">
         {
@@ -103,46 +65,26 @@
       </script>
     {% endblock %}
 
-    {# ---- Assets & Performance ---- #}
     <meta name="theme-color" content="#020617" />
 
-    {# Favicon Strategy: ICO for legacy, SVG for modern, PNGs for fallbacks #}
+    {# --- ICONS --- #}
     <link rel="icon" href="{% static 'icons/favicon.ico' %}" sizes="any" />
-    <link rel="icon" href="{% static 'icons/icon.svg' %}" type="image/svg+xml" />
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'icons/favicon-32x32.png' %}" />
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'icons/favicon-16x16.png' %}" />
     <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}" />
-    <link rel="manifest" href="{% static 'site.webmanifest' %}" />
+    <link rel="manifest" href="{% static 'icons/site.webmanifest' %}" />
 
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
     <link rel="preconnect" href="https://player.cloudinary.com" crossorigin />
 
-    <link
-      rel="preload"
-      href="{% static 'fonts/Satoshi-Regular.woff2' %}"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="{% static 'fonts/ClashDisplay-Bold.woff2' %}"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
+    {# --- FONTS & CSS --- #}
+    <link rel="preload" href="{% static 'fonts/Satoshi-Regular.woff2' %}" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="{% static 'fonts/ClashDisplay-Bold.woff2' %}" as="font" type="font/woff2" crossorigin />
 
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}" />
 
-    <style>
-      [x-cloak] {
-        display: none !important;
-      }
-    </style>
-
-    {# Force manual scroll restoration to prevent stuck header states #}
     <script>
-      if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     </script>
 
     <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
@@ -151,14 +93,26 @@
     {% block extra_head %}{% endblock %}
   </head>
 
+  {# --- BODY UPDATE: Only changing classes here to match new CSS --- #}
   <body
-    class="flex flex-col h-full min-h-screen bg-slate-950 text-slate-50 font-sans selection:bg-emerald-500/30 overflow-x-hidden"
+    class="flex flex-col h-full min-h-screen bg-odin-bg text-text-main font-sans selection:bg-primary selection:text-odin-bg overflow-x-hidden"
+    hx-boost="true"
+    hx-indicator="#global-loading"
   >
-    {# 1. HEADER (Fixed position, sits on top) #}
+    {# --- Global Loading Bar (HTMX) --- #}
+    <div id="global-loading" class="fixed top-0 left-0 w-full h-1 bg-primary z-100 transition-opacity duration-300 htmx-indicator"></div>
+
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-200
+             focus:rounded-lg focus:bg-odin-surface focus:px-4 focus:py-2 focus:text-primary
+             focus:outline-none focus:ring-2 focus:ring-primary"
+    >
+      Skip to content
+    </a>
+
     {% include "partials/header.html" %}
 
-    {# 2. MAIN CONTENT (Starts at top:0) #}
-    {# The relative class allows child absolute elements to position correctly, but it starts BEHIND the header #}
     <main id="main-content" class="grow w-full relative z-0" role="main">
       {% block content %}{% endblock %}
     </main>
@@ -166,13 +120,20 @@
     {% include "partials/footer.html" %}
 
     <noscript>
-      <div
-        class="p-4 text-center text-sm text-slate-200 bg-slate-900 border-t border-white/10"
-      >
+      <div class="p-4 text-center text-sm text-text-muted bg-odin-surface border-t border-odin-border">
         This site works best with JavaScript enabled.
       </div>
     </noscript>
 
     {% block extra_body %}{% endblock %}
+
+    <script>
+      (() => {
+        const set = () => document.documentElement.style.setProperty("--app-vh", `${window.innerHeight}px`);
+        set();
+        addEventListener("resize", set, { passive: true });
+        addEventListener("orientationchange", set, { passive: true });
+      })();
+    </script>
   </body>
 </html>

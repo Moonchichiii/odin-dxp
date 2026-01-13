@@ -6,17 +6,21 @@ from wagtail.snippets.blocks import SnippetChooserBlock
 
 class HeroCtaBlock(blocks.StructBlock):
     """
-    Reusable CTA block specifically for the Hero section.
+    A specific button style for the Hero section (Big & Bold).
     """
 
-    label = blocks.CharBlock(required=True, max_length=50)
-    page = blocks.PageChooserBlock(required=False)
-    url = blocks.URLBlock(required=False, label="External URL")
+    label = blocks.CharBlock(
+        required=True, max_length=50, help_text="Text to appear on the button (e.g., 'Get Tickets')."
+    )
+    page = blocks.PageChooserBlock(required=False, help_text="Link to an internal page.")
+    url = blocks.URLBlock(
+        required=False, label="External URL", help_text="Link to an external site (e.g., https://google.com)."
+    )
     style = blocks.ChoiceBlock(
         choices=[
-            ("primary", "Primary"),
-            ("secondary", "Secondary"),
-            ("ghost", "Ghost"),
+            ("primary", "Primary (Green Glow)"),
+            ("secondary", "Secondary (Glass/Border)"),
+            ("ghost", "Ghost (Text Link)"),
         ],
         default="primary",
         required=False,
@@ -24,68 +28,59 @@ class HeroCtaBlock(blocks.StructBlock):
 
     class Meta:
         icon = "link"
-        label = "Hero CTA"
+        label = "Hero Button"
 
 
 class HeroBlock(blocks.StructBlock):
-    title = blocks.CharBlock(
-        required=False,
-        help_text="Main headline (optional).",
-    )
+    """
+    Full-screen hero section with video background and centered text.
+    """
+
+    title = blocks.CharBlock(required=True, help_text="Main headline (H1). Keep it punchy.", default="The Future of AI")
     subtitle = blocks.CharBlock(
         required=False,
-        help_text="Highlighted text (optional).",
+        help_text="Gradient text below the headline (optional).",
     )
-    description = blocks.TextBlock(required=False)
-
-    extra_images = blocks.ListBlock(
-        ImageChooserBlock(required=False),
-        required=False,
-        label="Extra hero images (optional)",
-        help_text="Logos / badges displayed over the hero background.",
+    description = blocks.TextBlock(
+        required=False, help_text="Small uppercase text above the headline (e.g., 'OCTOBER 2026 • AMSTERDAM')."
     )
 
-    extra_images_position = blocks.ChoiceBlock(
-        choices=[
-            ("top", "Top"),
-            ("center", "Center"),
-            ("bottom", "Bottom"),
-        ],
-        default="top",
-        required=False,
-        label="Extra images position",
-    )
-
-    # Option A (recommended for speed): Cloudinary IDs
+    # Media
     video_public_id = blocks.CharBlock(
         required=False,
-        label="Video Public ID (Cloudinary)",
-        help_text="e.g. 'odin/hero-bg'. If set, takes priority over uploaded video.",
+        label="Cloudinary Video ID",
+        help_text="The 'Public ID' from Cloudinary (e.g., 'odin/hero-bg'). Optimized for streaming.",
     )
     poster_public_id = blocks.CharBlock(
         required=False,
-        label="Poster/Image Public ID (Cloudinary)",
-        help_text="e.g. 'odin/hero-bg-poster'. Used as fallback + while video loads.",
+        label="Cloudinary Poster ID",
+        help_text="Image ID to show while video loads (e.g., 'odin/hero-poster').",
     )
 
-    # Option B: Upload in Wagtail (optional)
+    # Fallback Uploads
     video_upload = DocumentChooserBlock(
         required=False,
-        label="Upload Video (optional)",
-        help_text="Upload MP4/WebM. Used only if Video Public ID is empty.",
+        label="Upload Video (Fallback)",
+        help_text="Upload MP4 if not using Cloudinary ID.",
     )
     poster_upload = ImageChooserBlock(
         required=False,
-        label="Upload Poster Image (optional)",
-        help_text="Fallback image if no video, or while video loads.",
+        label="Upload Poster (Fallback)",
+        help_text="Upload an image if not using Cloudinary ID.",
     )
 
-    # Updated: List of buttons instead of single link
+    # Extra visual elements
+    extra_images = blocks.ListBlock(
+        ImageChooserBlock(),
+        required=False,
+        label="Floating Logos",
+        help_text="Add sponsor logos or badges to float above the title.",
+    )
+
     cta_buttons = blocks.ListBlock(
         HeroCtaBlock(),
         required=False,
-        label="Hero CTA buttons",
-        help_text="Add one or more buttons under the hero text.",
+        label="Call to Action Buttons",
     )
 
     class Meta:
@@ -95,22 +90,34 @@ class HeroBlock(blocks.StructBlock):
 
 
 class ContentBlock(blocks.StructBlock):
-    heading = blocks.CharBlock(required=False)
-    text = blocks.RichTextBlock()
+    """
+    Standard text section with a glass card background.
+    """
+
+    heading = blocks.CharBlock(required=False, help_text="Section title.")
+    text = blocks.RichTextBlock(
+        features=["bold", "italic", "link", "ul", "ol"],
+        help_text="Main content. Formatting is limited to keep the design clean.",
+    )
 
     class Meta:
         template = "cms_integration/blocks/content_block.html"
         icon = "doc-full"
-        label = "Text Section"
+        label = "Content Section"
 
 
 class SpeakerGridBlock(blocks.StructBlock):
+    """
+    Displays a grid of selected speakers.
+    """
+
     title = blocks.CharBlock(default="Meet the Legends")
-    description = blocks.TextBlock(required=False)
+    description = blocks.TextBlock(required=False, help_text="Introductory text below the title.")
 
     featured_speakers = blocks.ListBlock(
         SnippetChooserBlock("cms_integration.Speaker"),
-        label="Select Speakers to highlight",
+        label="Select Speakers",
+        help_text="Search and select speakers to display in this grid.",
     )
 
     class Meta:
@@ -120,11 +127,16 @@ class SpeakerGridBlock(blocks.StructBlock):
 
 
 class PartnerGridBlock(blocks.StructBlock):
+    """
+    Displays a grid of partners/sponsors.
+    """
+
     title = blocks.CharBlock(default="Commercial Partners")
 
     partners = blocks.ListBlock(
         SnippetChooserBlock("cms_integration.Partner"),
-        label="Select Partners to display",
+        label="Select Partners",
+        help_text="Search and select sponsors to display.",
     )
 
     class Meta:
@@ -134,12 +146,12 @@ class PartnerGridBlock(blocks.StructBlock):
 
 
 class FAQItemBlock(blocks.StructBlock):
-    question = blocks.CharBlock(required=True, label="Question")
-    answer = blocks.RichTextBlock(required=True, label="Answer")
+    question = blocks.CharBlock(required=True)
+    answer = blocks.RichTextBlock(features=["bold", "italic", "link"])
 
     class Meta:
         icon = "help"
-        label = "FAQ Item"
+        label = "Q&A"
 
 
 class FAQSectionBlock(blocks.StructBlock):
@@ -149,4 +161,4 @@ class FAQSectionBlock(blocks.StructBlock):
     class Meta:
         template = "cms_integration/blocks/faq_section_block.html"
         icon = "help"
-        label = "AEO / FAQ Section"
+        label = "FAQ Section"

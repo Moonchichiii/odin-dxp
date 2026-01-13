@@ -1,0 +1,101 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@source "../../templates";
+@source "../../apps";
+
+@theme {
+  /* --- TYPOGRAPHY --- */
+  --font-sans: "Satoshi", "system-ui", "sans-serif";
+  --font-display: "ClashDisplay", "system-ui", "sans-serif";
+
+  /* --- PALETTE: THE ODIN DARK THEME --- */
+  /* The main background (Deepest Dark) */
+  --color-odin-bg: #020617;
+
+  /* Cards / Surfaces (Slightly lighter) */
+  --color-odin-surface: #0f172a;
+  --color-odin-surface-hover: #1e293b;
+
+  /* Borders (Subtle) */
+  --color-odin-border: #1e293b;
+
+  /* Brand Colors (Emerald/Green) */
+  --color-primary: #10b981;       /* Base Green */
+  --color-primary-glow: #34d399;  /* Brighter for glows */
+  --color-primary-dim: #064e3b;   /* Darker for backgrounds */
+
+  /* Text Colors */
+  --color-text-main: #f8fafc;     /* Almost White */
+  --color-text-muted: #94a3b8;    /* Muted Blue-Grey */
+
+  /* --- ANIMATIONS --- */
+  --animate-fade-in-up: fadeInUp 0.8s ease-out forwards;
+  --animate-glow-pulse: glowPulse 4s ease-in-out infinite;
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+  }
+}
+
+/* --- GLOBAL DEFAULTS --- */
+:root {
+  --app-vh: 100vh;
+}
+
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-primary-glow);
+    outline-offset: 2px;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-odin-bg text-text-main font-sans antialiased selection:bg-primary-dim selection:text-primary-glow;
+  }
+
+  /* Typography Defaults */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold tracking-tight text-white;
+  }
+
+  p {
+    @apply leading-relaxed text-text-muted;
+  }
+
+  /* Typography Plugin Overrides (for Rich Text) */
+  .prose {
+    @apply max-w-none;
+    /* Headings */
+    --tw-prose-headings: white;
+    --tw-prose-invert-headings: white;
+    /* Body */
+    --tw-prose-body: var(--color-text-muted);
+    --tw-prose-invert-body: var(--color-text-muted);
+    /* Links */
+    --tw-prose-links: var(--color-primary-glow);
+    --tw-prose-invert-links: var(--color-primary-glow);
+    /* Bold */
+    --tw-prose-bold: white;
+    --tw-prose-invert-bold: white;
+  }
+}
+
+/* --- UTILITIES --- */
+[x-cloak] { display: none !important; }
+
+/* Premium Header Blur Effect */
+#site-header[data-solid="true"] {
+  background: rgba(2, 6, 23, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
