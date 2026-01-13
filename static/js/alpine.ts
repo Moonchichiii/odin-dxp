@@ -6,6 +6,7 @@ Alpine.plugin(collapse);
 declare global {
   interface Window {
     Alpine: typeof Alpine;
+    scrollPastHero?: () => void; // Added type definition
   }
 }
 window.Alpine = Alpine;
@@ -13,6 +14,7 @@ window.Alpine = Alpine;
 const HEADER_ID = "site-header";
 const HERO_SELECTOR = ".hero-section";
 const SOLID_AT_PX = 12;
+const ROOT = document.documentElement; // New: For CSS Vars
 
 // Avoid double-binding (HTMX + BFCache + hot reload)
 let bound = false;
@@ -33,9 +35,19 @@ function setSolid(header: HTMLElement, solid: boolean): void {
   header.setAttribute("data-solid", solid ? "true" : "false");
 }
 
+// --- NEW HELPER: Set Header Height CSS Variable ---
+function setHeaderHeightVar(): void {
+  const header = getHeader();
+  if (!header) return;
+  ROOT.style.setProperty("--header-h", `${header.offsetHeight}px`);
+}
+
 function applyHeaderState(): void {
   const header = getHeader();
   if (!header) return;
+
+  // --- NEW: Sync height var on every state check/resize ---
+  setHeaderHeightVar();
 
   const hero = hasHero();
   header.toggleAttribute("data-has-hero", hero);
@@ -97,6 +109,19 @@ function bindHeader(): void {
   document.body.addEventListener("htmx:afterSwap", () => requestAnimationFrame(applyHeaderState));
   document.body.addEventListener("htmx:afterSettle", () => requestAnimationFrame(applyHeaderState));
 }
+
+// --- NEW FUNCTION: Smart Scroll ---
+function scrollPastHero(): void {
+  const hero = document.querySelector(HERO_SELECTOR) as HTMLElement | null;
+  if (!hero) return;
+
+  // Scroll exactly to where the hero ends
+  const heroBottom = hero.getBoundingClientRect().bottom + window.scrollY;
+  window.scrollTo({ top: heroBottom, behavior: "smooth" });
+}
+
+// Expose to window so Alpine/HTML can call it
+window.scrollPastHero = scrollPastHero;
 
 document.addEventListener("DOMContentLoaded", () => {
   Alpine.start();

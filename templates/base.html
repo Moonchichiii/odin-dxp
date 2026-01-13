@@ -100,8 +100,9 @@
     hx-indicator="#global-loading"
   >
     {# --- Global Loading Bar (HTMX) --- #}
-    <div id="global-loading" class="fixed top-0 left-0 w-full h-1 bg-primary z-100 transition-opacity duration-300 htmx-indicator"></div>
-
+    {% comment %} <div id="global-loading" class="fixed top-0 left-0 w-full h-1 bg-primary z-100 transition-opacity duration-300 htmx-indicator"></div> {% endcomment %}
+{# Was missing opacity-0 #}
+<div id="global-loading" class="fixed top-0 left-0 w-full h-1 bg-primary z-100 opacity-0 transition-opacity duration-300 htmx-indicator"></div>
     <a
       href="#main-content"
       class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-200
@@ -118,6 +119,7 @@
     </main>
 
     {% include "partials/footer.html" %}
+    {% include "partials/social_floating.html" %}
 
     <noscript>
       <div class="p-4 text-center text-sm text-text-muted bg-odin-surface border-t border-odin-border">

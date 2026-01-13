@@ -4,34 +4,79 @@
 @source "../../templates";
 @source "../../apps";
 
+/* --- 1. LOAD FONTS --- */
+/* Relative path: static/css/tailwind.css -> static/fonts/ */
+@layer base {
+  @font-face {
+    font-family: "Satoshi";
+    src: url("../fonts/Satoshi-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Satoshi";
+    src: url("../fonts/Satoshi-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Satoshi";
+    src: url("../fonts/Satoshi-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "ClashDisplay";
+    src: url("../fonts/ClashDisplay-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "ClashDisplay";
+    src: url("../fonts/ClashDisplay-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+}
+
+/* --- GLOBAL DEFAULTS --- */
+:root {
+  --app-vh: 100vh;
+  /* ADD THIS LINE BELOW: */
+  --header-h: 80px; /* Fallback safe height */
+}
+
 @theme {
   /* --- TYPOGRAPHY --- */
-  --font-sans: "Satoshi", "system-ui", "sans-serif";
-  --font-display: "ClashDisplay", "system-ui", "sans-serif";
+  /* Note: Quotes removed from system keywords for safety */
+  --font-sans: "Satoshi", system-ui, sans-serif;
+  --font-display: "ClashDisplay", system-ui, sans-serif;
 
   /* --- PALETTE: THE ODIN DARK THEME --- */
-  /* The main background (Deepest Dark) */
   --color-odin-bg: #020617;
-
-  /* Cards / Surfaces (Slightly lighter) */
   --color-odin-surface: #0f172a;
   --color-odin-surface-hover: #1e293b;
-
-  /* Borders (Subtle) */
   --color-odin-border: #1e293b;
 
-  /* Brand Colors (Emerald/Green) */
-  --color-primary: #10b981;       /* Base Green */
-  --color-primary-glow: #34d399;  /* Brighter for glows */
-  --color-primary-dim: #064e3b;   /* Darker for backgrounds */
+  /* Brand Colors */
+  --color-primary: #10b981;
+  --color-primary-glow: #34d399;
+  --color-primary-dim: #064e3b;
 
   /* Text Colors */
-  --color-text-main: #f8fafc;     /* Almost White */
-  --color-text-muted: #94a3b8;    /* Muted Blue-Grey */
+  --color-text-main: #f8fafc;
+  --color-text-muted: #94a3b8;
 
   /* --- ANIMATIONS --- */
   --animate-fade-in-up: fadeInUp 0.8s ease-out forwards;
   --animate-glow-pulse: glowPulse 4s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
 
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(20px); }
@@ -41,14 +86,31 @@
     0%, 100% { opacity: 0.3; }
     50% { opacity: 0.6; }
   }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
 }
 
-/* --- GLOBAL DEFAULTS --- */
-:root {
-  --app-vh: 100vh;
+/* --- UTILITIES --- */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .bg-hero-vignette {
+    background: radial-gradient(circle at center, transparent 0%, rgba(2, 6, 23, 0.4) 60%, #020617 100%);
+  }
+
+  .glass-panel {
+    @apply bg-white/[0.03] backdrop-blur-md border border-white/[0.08];
+  }
 }
 
+/* --- BASE STYLES --- */
 @layer base {
+  [x-cloak] { display: none !important; }
+
   :focus-visible {
     outline: 2px solid var(--color-primary-glow);
     outline-offset: 2px;
@@ -62,7 +124,6 @@
     @apply bg-odin-bg text-text-main font-sans antialiased selection:bg-primary-dim selection:text-primary-glow;
   }
 
-  /* Typography Defaults */
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-bold tracking-tight text-white;
   }
@@ -71,26 +132,19 @@
     @apply leading-relaxed text-text-muted;
   }
 
-  /* Typography Plugin Overrides (for Rich Text) */
+  /* Prose Overrides */
   .prose {
     @apply max-w-none;
-    /* Headings */
     --tw-prose-headings: white;
     --tw-prose-invert-headings: white;
-    /* Body */
     --tw-prose-body: var(--color-text-muted);
     --tw-prose-invert-body: var(--color-text-muted);
-    /* Links */
     --tw-prose-links: var(--color-primary-glow);
     --tw-prose-invert-links: var(--color-primary-glow);
-    /* Bold */
     --tw-prose-bold: white;
     --tw-prose-invert-bold: white;
   }
 }
-
-/* --- UTILITIES --- */
-[x-cloak] { display: none !important; }
 
 /* Premium Header Blur Effect */
 #site-header[data-solid="true"] {

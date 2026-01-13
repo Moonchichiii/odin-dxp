@@ -35,7 +35,10 @@ class NavItemBlock(blocks.StructBlock):
     page = blocks.PageChooserBlock(required=False)
     url = blocks.URLBlock(required=False, label="External URL")
     children = blocks.ListBlock(
-        LinkBlock(), required=False, label="Dropdown Items", help_text="Add links here to create a dropdown menu."
+        LinkBlock(),
+        required=False,
+        label="Dropdown Items",
+        help_text="Add links here to create a dropdown menu.",
     )
 
     def get_url(self, value: Mapping[str, Any]) -> str:
@@ -56,7 +59,11 @@ class CtaLinkBlock(blocks.StructBlock):
     page = blocks.PageChooserBlock(required=False)
     url = blocks.URLBlock(required=False, label="External URL")
     style = blocks.ChoiceBlock(
-        choices=[("primary", "Primary (Green)"), ("secondary", "Secondary (Border)"), ("ghost", "Ghost (Text)")],
+        choices=[
+            ("primary", "Primary (Green)"),
+            ("secondary", "Secondary (Border)"),
+            ("ghost", "Ghost (Text)"),
+        ],
         default="primary",
         required=False,
     )
@@ -88,8 +95,8 @@ class HeaderSettings(BaseSiteSetting):
         help_text="Text description of the logo for screen readers (e.g. 'DXP Odin').",
     )
 
-    primary_navigation = StreamField([("item", NavItemBlock())], use_json_field=True, blank=True)
-    cta_buttons = StreamField([("cta", CtaLinkBlock())], use_json_field=True, blank=True)
+    primary_navigation: StreamField = StreamField([("item", NavItemBlock())], use_json_field=True, blank=True)
+    cta_buttons: StreamField = StreamField([("cta", CtaLinkBlock())], use_json_field=True, blank=True)
 
     panels = [
         MultiFieldPanel(
@@ -121,10 +128,26 @@ class FooterSettings(BaseSiteSetting):
     )
 
     footer_col_1_title: models.CharField = models.CharField(default="Explore", max_length=50)
-    footer_col_1_links = StreamField([("link", LinkBlock())], use_json_field=True, blank=True)
+    footer_col_1_links: StreamField = StreamField([("link", LinkBlock())], use_json_field=True, blank=True)
 
     footer_col_2_title: models.CharField = models.CharField(default="Company", max_length=50)
-    footer_col_2_links = StreamField([("link", LinkBlock())], use_json_field=True, blank=True)
+    footer_col_2_links: StreamField = StreamField([("link", LinkBlock())], use_json_field=True, blank=True)
+
+    # === NEW: Social Media & Toggle Configuration ===
+    show_floating_social_bar: models.BooleanField = models.BooleanField(
+        default=True,
+        verbose_name="Enable Floating Social Bar",
+        help_text=(
+            "If checked, a glass sidebar with social icons will appear on the right side of the screen "
+            "(Desktop only)."
+        ),
+    )
+
+    social_linkedin: models.URLField = models.URLField(blank=True, help_text="LinkedIn URL")
+    social_x: models.URLField = models.URLField(blank=True, help_text="X (Twitter) URL")
+    social_instagram: models.URLField = models.URLField(blank=True, help_text="Instagram URL")
+    social_youtube: models.URLField = models.URLField(blank=True, help_text="YouTube URL")
+    social_facebook: models.URLField = models.URLField(blank=True, help_text="Facebook URL")
 
     panels = [
         FieldPanel("footer_description"),
@@ -141,6 +164,18 @@ class FooterSettings(BaseSiteSetting):
                 FieldPanel("footer_col_2_links"),
             ],
             heading="Column 2",
+        ),
+        # === NEW PANEL GROUP ===
+        MultiFieldPanel(
+            [
+                FieldPanel("show_floating_social_bar"),
+                FieldPanel("social_linkedin"),
+                FieldPanel("social_x"),
+                FieldPanel("social_instagram"),
+                FieldPanel("social_youtube"),
+                FieldPanel("social_facebook"),
+            ],
+            heading="Social Media & Floating Bar",
         ),
     ]
 
