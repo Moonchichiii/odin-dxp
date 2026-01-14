@@ -114,6 +114,7 @@ class ClientQuickActionsPanel:
         footer_settings_url = (
             safe_reverse("wagtailsettings:edit", "cms_integration", "footersettings") or settings_index
         )
+        flash_sale_url = safe_reverse("wagtailsettings:edit", "cms_integration", "flashsalesettings") or settings_index
 
         speakers_url = snippet_list_url("cms_integration", "speaker")
         partners_url = snippet_list_url("cms_integration", "partner")
@@ -126,6 +127,7 @@ class ClientQuickActionsPanel:
             "pages_url": pages_url,
             "header_settings_url": header_settings_url,
             "footer_settings_url": footer_settings_url,
+            "flash_sale_url": flash_sale_url,
             "speakers_url": speakers_url,
             "partners_url": partners_url,
         }

@@ -3,7 +3,6 @@
   class="relative w-full py-20 overflow-hidden bg-odin-bg border-y border-odin-border"
   x-data="countdown('{{ self.target_date|date:'Y-m-d H:i:s' }}')"
 >
-  {# Background Glow #}
   <div class="absolute inset-0 bg-primary/5 blur-[100px] pointer-events-none"></div>
 
   <div class="relative z-10 mx-auto max-w-4xl px-6 text-center">
@@ -44,38 +43,5 @@
       </a>
     {% endif %}
   </div>
-
-  <script>
-    document.addEventListener('alpine:init', () => {
-      Alpine.data('countdown', (expiry) => ({
-        expiry: new Date(expiry).getTime(),
-        expired: false,
-        days: '00', hours: '00', minutes: '00', seconds: '00',
-        _timer: null,
-
-        init() {
-          this.tick();
-          this._timer = setInterval(() => this.tick(), 1000);
-        },
-
-        tick() {
-          const now = Date.now();
-          const dist = this.expiry - now;
-
-          if (dist <= 0) {
-            this.expired = true;
-            this.days = '00'; this.hours = '00'; this.minutes = '00'; this.seconds = '00';
-            if (this._timer) clearInterval(this._timer);
-            return;
-          }
-
-          this.days = Math.floor(dist / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-          this.hours = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-          this.minutes = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-          this.seconds = Math.floor((dist % (1000 * 60)) / 1000).toString().padStart(2, '0');
-        }
-      }))
-    })
-  </script>
 </section>
 {% endif %}

@@ -181,3 +181,60 @@ class FooterSettings(BaseSiteSetting):
 
     class Meta:
         verbose_name = "Footer Configuration"
+
+
+@register_setting(icon="time", order=120)
+class FlashSaleSettings(BaseSiteSetting):
+    is_active: models.BooleanField = models.BooleanField(
+        default=False,
+        verbose_name="Activate Flash Sale",
+        help_text="Check this to show the countdown timer on the site.",
+    )
+
+    title: models.CharField = models.CharField(
+        max_length=100,
+        default="2-For-1 Ticket Flash Sale Ends In",
+        help_text="The headline above the timer.",
+    )
+
+    end_date: models.DateTimeField = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When does the sale end?",
+    )
+
+    end_message: models.CharField = models.CharField(
+        max_length=100,
+        default="Flash Sale has ended!",
+        help_text="What to show when the timer hits zero.",
+    )
+
+    cta_label: models.CharField = models.CharField(
+        max_length=50,
+        default="Get Tickets",
+        blank=True,
+        help_text="Button label text.",
+    )
+
+    cta_url: models.URLField = models.URLField(
+        blank=True,
+        verbose_name="Button URL",
+        help_text="Where the button should link to.",
+    )
+
+    panels = [
+        FieldPanel("is_active"),
+        FieldPanel("title"),
+        FieldPanel("end_date"),
+        FieldPanel("end_message"),
+        MultiFieldPanel(
+            [
+                FieldPanel("cta_label"),
+                FieldPanel("cta_url"),
+            ],
+            heading="Call to Action",
+        ),
+    ]
+
+    class Meta:
+        verbose_name = "Flash Sale Configuration"
