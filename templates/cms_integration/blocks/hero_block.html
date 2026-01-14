@@ -36,14 +36,12 @@
   <div class="absolute inset-x-0 bottom-0 h-40 z-10 pointer-events-none bg-linear-to-t from-odin-bg to-transparent"></div>
 
   {# -------------------- 3. CONTENT LAYER -------------------- #}
-  {# MOBILE OPTIMIZATION: pt-24 (Higher up) and pb-24 (Clearance for scroll arrow) #}
   <div class="relative z-20 w-full h-full flex flex-col justify-center px-6 pt-24 md:pt-36 pb-24 md:pb-20">
 
     <div class="w-full max-w-7xl mx-auto flex flex-col items-center text-center">
 
       {# --- A. THE BRAIN --- #}
-      {# MOBILE: mb-4 (Tighter) #}
-      <div class="mb-4 md:mb-10 animate-fade-in-up" style="animation-delay: 0.1s">
+      <div class="mb-4 md:mb-8 animate-fade-in-up" style="animation-delay: 0.1s">
         {% if self.extra_images %}
           <div class="flex justify-center items-center gap-6">
             {% for img in self.extra_images %}
@@ -51,8 +49,10 @@
                 <img
                   src="{{ img.file.url }}"
                   alt="{{ img.title|default:'' }}"
-                  {# SIZING: Mobile h-24 -> Desktop h-64 -> Wide h-80 #}
-                  class="h-24 md:h-40 lg:h-64 xl:h-80 w-auto object-contain drop-shadow-[0_0_35px_rgba(16,185,129,0.5)] animate-pulse"
+                  class="
+                    w-auto object-contain drop-shadow-[0_0_35px_rgba(16,185,129,0.5)] animate-pulse
+                    h-[clamp(5rem,14vh,14rem)]
+                  "
                   loading="eager"
                   style="animation-duration: 4s;"
                 />
@@ -67,26 +67,27 @@
       </div>
 
       {# --- B. MAIN HEADLINE --- #}
-      {# MOBILE: mb-5 (Tighter gap to buttons) #}
       <h1
         id="hero-title"
         class="
           font-display font-bold text-white text-balance
-          text-3xl sm:text-4xl md:text-7xl lg:text-8xl
-          leading-[1.1] md:leading-none tracking-tight
+          leading-[1.1] md:leading-[1.0] tracking-tight
           drop-shadow-2xl
-          max-w-5xl mx-auto
-          mb-5 md:mb-12
+          max-w-6xl mx-auto
+          mb-6 md:mb-10
           animate-fade-in-up
         "
-        style="animation-delay: 0.2s"
+        style="
+          animation-delay: 0.2s;
+          font-size: clamp(2.25rem, 5vw, 5.5rem);
+        "
       >
         {{ self.title }}
 
         {% if self.subtitle %}
-          {# MOBILE: text-sm (Compact) and mt-2 (Tight) #}
           <span
-            class="block mt-2 md:mt-6 text-sm sm:text-base md:text-2xl lg:text-3xl font-normal font-sans tracking-normal text-transparent bg-clip-text bg-linear-to-r from-text-muted via-white to-text-muted max-w-3xl mx-auto"
+            class="block mt-2 md:mt-6 font-normal font-sans tracking-normal text-transparent bg-clip-text bg-linear-to-r from-text-muted via-white to-text-muted max-w-3xl mx-auto"
+            style="font-size: clamp(0.875rem, 1.5vw, 1.5rem);"
           >
             {{ self.subtitle }}
           </span>
@@ -95,8 +96,7 @@
 
       {# --- C. CTA BUTTONS --- #}
       {% if self.cta_buttons %}
-        {# MOBILE: gap-2.5 (Saves vertical space) #}
-        <div class="flex flex-col md:flex-row items-center justify-center gap-2.5 md:gap-6 w-full md:w-auto animate-fade-in-up" style="animation-delay: 0.4s">
+        <div class="flex flex-col md:flex-row flex-wrap items-center justify-center gap-3 md:gap-6 w-full md:w-auto animate-fade-in-up" style="animation-delay: 0.4s">
           {% for item in self.cta_buttons %}
             {% with cta=item.value|default:item %}
               {% if cta.page or cta.url %}
@@ -136,9 +136,10 @@
   </div>
 
   {# --- 4. SCROLL INDICATOR --- #}
+  {# TWEAK: bottom-4 (Mobile) -> bottom-8 (Desktop) -> bottom-12 (Ultra-Wide) #}
   <button
     @click="window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })"
-    class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 animate-float opacity-50 hover:opacity-100 transition-opacity cursor-pointer mix-blend-screen"
+    class="absolute bottom-4 lg:bottom-8 2xl:bottom-12 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 animate-float opacity-50 hover:opacity-100 transition-opacity cursor-pointer mix-blend-screen"
     aria-label="Scroll down"
   >
     <span class="text-[10px] uppercase tracking-widest text-white/60">Scroll</span>

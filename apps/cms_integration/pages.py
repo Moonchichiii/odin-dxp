@@ -11,7 +11,15 @@ from wagtail.fields import StreamField
 from wagtail.models import Page
 from wagtail.query import PageQuerySet
 
-from .blocks import ContentBlock, FAQSectionBlock, HeroBlock, PartnerGridBlock, SpeakerGridBlock
+from .blocks import (
+    ContentBlock,
+    CountdownBlock,
+    FAQSectionBlock,
+    HeroBlock,
+    PartnerGridBlock,
+    SpeakerGridBlock,
+    TestimonialGridBlock,
+)
 from .mixins import SEOAttributes
 from .snippets import Partner, Speaker
 
@@ -20,6 +28,7 @@ class SpeakersIndexPage(RoutablePageMixin, Page):
     """
     Logic for /speakers/ and /speakers/{slug}/
     """
+
     template = "cms_integration/speakers_index.html"
     subpage_types: list[str] = []  # No child pages allowed
 
@@ -38,6 +47,7 @@ class SponsorsIndexPage(RoutablePageMixin, Page):
     """
     Logic for /sponsors/ and /sponsors/{slug}/
     """
+
     template = "cms_integration/sponsors_index.html"
     subpage_types: list[str] = []
 
@@ -61,7 +71,9 @@ class HomePage(SEOAttributes, Page):
     body = StreamField(
         [
             ("hero", HeroBlock()),
+            ("countdown", CountdownBlock()),
             ("content_section", ContentBlock()),
+            ("testimonial_grid", TestimonialGridBlock()),
             ("speaker_grid", SpeakerGridBlock()),
             ("partner_grid", PartnerGridBlock()),
             ("faq_section", FAQSectionBlock()),

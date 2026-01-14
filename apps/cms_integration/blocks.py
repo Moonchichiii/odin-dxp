@@ -89,6 +89,62 @@ class HeroBlock(blocks.StructBlock):
         label = "Hero Section"
 
 
+class CountdownBlock(blocks.StructBlock):
+    """
+    High-urgency countdown timer for ticket sales.
+    """
+
+    enabled = blocks.BooleanBlock(
+        required=False,
+        default=True,
+        help_text="Turn this ON/OFF without removing the block.",
+    )
+
+    title = blocks.CharBlock(default="Ticket Flash Sale Ends In")
+    target_date = blocks.DateTimeBlock(help_text="The date/time the countdown ends.")
+    end_message = blocks.CharBlock(
+        default="Sale Ended",
+        help_text="Text to show when time is up.",
+    )
+
+    cta_label = blocks.CharBlock(required=False, label="Button Label")
+    cta_url = blocks.URLBlock(required=False, label="Button URL")
+
+    class Meta:
+        template = "cms_integration/blocks/countdown_block.html"
+        icon = "time"
+        label = "Countdown Timer"
+
+
+class QuoteItemBlock(blocks.StructBlock):
+    quote = blocks.TextBlock(required=True)
+    author = blocks.CharBlock(required=False)
+    role = blocks.CharBlock(required=False)
+    organization = blocks.CharBlock(
+        required=False,
+        help_text="e.g. Microsoft",
+    )
+    logo = ImageChooserBlock(required=False)
+
+    class Meta:
+        icon = "openquote"
+        label = "Quote"
+
+
+class TestimonialGridBlock(blocks.StructBlock):
+    """
+    Grid of quotes/testimonials.
+    """
+
+    title = blocks.CharBlock(required=False, default="What People Are Saying")
+    quotes = blocks.ListBlock(QuoteItemBlock(), label="Testimonials")
+
+    class Meta:
+        template = "cms_integration/blocks/testimonial_grid_block.html"
+        icon = "openquote"
+        label = "Testimonials"
+
+
 class ContentBlock(blocks.StructBlock):
     """
     Standard text section with a glass card background.
