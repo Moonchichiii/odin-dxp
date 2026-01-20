@@ -33,3 +33,11 @@ repos:
           - django-cloudinary-storage
           - wagtail
         args: ["--config-file=pyproject.toml"]
+
+  - repo: local
+    hooks:
+      - id: no-literal-wagtail-tags
+        name: Prevent literal Wagtail template tags in HTML output
+        entry: python check_templates_no_literal_tags.py
+        language: system
+        pass_filenames: false
