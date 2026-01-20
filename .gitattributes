@@ -1,29 +1,31 @@
-# Normalize line endings in repo
-* text=auto
+# Default: normalize text files and store as LF in the repo
+* text=auto eol=lf
 
-# Force LF for code/templates/config
-*.py   text eol=lf
-*.html text eol=lf
-*.css  text eol=lf
-*.js   text eol=lf
-*.ts   text eol=lf
-*.json text eol=lf
-*.md   text eol=lf
-*.yml  text eol=lf
-*.yaml text eol=lf
-*.toml text eol=lf
-*.sh   text eol=lf
-
-# Windows scripts (if you have them)
+# Windows scripts: keep CRLF
 *.bat  text eol=crlf
 *.ps1  text eol=crlf
 
-# Binary files (never touch line endings)
-*.png binary
-*.jpg binary
-*.jpeg binary
-*.webp binary
-*.ico binary
-*.woff binary
+# Common text/code formats (explicit LF; mostly redundant with the default, but kept for clarity)
+*.py    text eol=lf
+*.html  text eol=lf
+*.css   text eol=lf
+*.js    text eol=lf
+*.ts    text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.toml  text eol=lf
+*.sh    text eol=lf
+*.svg   text eol=lf
+
+# Binary files (never modify line endings)
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.webp  binary
+*.gif   binary
+*.ico   binary
+*.woff  binary
 *.woff2 binary
-*.pdf binary
+*.pdf   binary
