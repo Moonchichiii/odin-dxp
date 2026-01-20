@@ -1,0 +1,43 @@
+{% load cloudinary_helper wagtailimages_tags %}
+
+<a
+  href="{{ sponsor.website|default:'#' }}"
+  class="sponsor-tilt group block"
+  {%
+  if
+  sponsor.website
+  %}target="_blank"
+  rel="noopener"
+  {%
+  endif
+  %}
+>
+  <div class="sponsor-card">
+    <div class="sponsor-glass">
+      <div class="sponsor-logo">
+        {% if sponsor.logo_upload %} {% image sponsor.logo_upload max-520x220
+        class="sponsor-logo-img" alt=sponsor.name loading="lazy"
+        decoding="async" %} {% elif sponsor.logo_public_id %}
+        <img
+          src="{% cld_img sponsor.logo_public_id width=520 height=220 gravity='auto' %}"
+          alt="{{ sponsor.name }}"
+          class="sponsor-logo-img"
+          loading="lazy"
+          decoding="async"
+        />
+        {% else %}
+        <div class="text-text-muted text-xs">No logo</div>
+        {% endif %}
+      </div>
+
+      <div class="sponsor-meta">
+        <p class="sponsor-name">{{ sponsor.name }}</p>
+        {% if sponsor.tier %}
+        <p class="sponsor-tier">{{ sponsor.tier }}</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="sponsor-corner" aria-hidden="true"></div>
+  </div>
+</a>

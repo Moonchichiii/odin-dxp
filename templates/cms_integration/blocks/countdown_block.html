@@ -1,47 +1,53 @@
-{% if self.enabled %}
-<section
-  class="relative w-full py-20 overflow-hidden bg-odin-bg border-y border-odin-border"
-  x-data="countdown('{{ self.target_date|date:'Y-m-d H:i:s' }}')"
->
-  <div class="absolute inset-0 bg-primary/5 blur-[100px] pointer-events-none"></div>
+{% load wagtailsettings_tags %}
+{% get_settings use_default_site=True %}
 
-  <div class="relative z-10 mx-auto max-w-4xl px-6 text-center">
-    <h2 class="font-display text-3xl md:text-5xl font-bold text-white mb-12">
-      {{ self.title }}
-    </h2>
+{% with sale=settings.cms_integration.FlashSaleSettings %}
+  {% if sale.is_active and sale.end_date %}
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-      <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
-        <span class="font-display text-4xl md:text-6xl font-bold text-primary" x-text="days">00</span>
-        <span class="text-xs uppercase tracking-widest text-text-muted mt-2">Days</span>
+    <section
+      class="relative w-full py-20 overflow-hidden bg-odin-bg border-y border-odin-border"
+      x-data="countdown('{{ sale.end_date|date:'Y-m-d H:i:s' }}')"
+    >
+      <div class="absolute inset-0 bg-primary/5 blur-[100px] pointer-events-none"></div>
+
+      <div class="relative z-10 mx-auto max-w-4xl px-6 text-center">
+        <h2 class="font-display text-3xl md:text-5xl font-bold text-white mb-12">
+          {{ sale.title }}
+        </h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+          <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
+            <span class="font-display text-4xl md:text-6xl font-bold text-primary" x-text="days">00</span>
+            <span class="text-xs uppercase tracking-widest text-text-muted mt-2">Days</span>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
+            <span class="font-display text-4xl md:text-6xl font-bold text-white" x-text="hours">00</span>
+            <span class="text-xs uppercase tracking-widest text-text-muted mt-2">Hours</span>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
+            <span class="font-display text-4xl md:text-6xl font-bold text-white" x-text="minutes">00</span>
+            <span class="text-xs uppercase tracking-widest text-text-muted mt-2">Mins</span>
+          </div>
+
+          <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
+            <span class="font-display text-4xl md:text-6xl font-bold text-primary" x-text="seconds">00</span>
+            <span class="text-xs uppercase tracking-widest text-text-muted mt-2">Secs</span>
+          </div>
+        </div>
+
+        <div x-show="expired" style="display: none;" class="text-2xl font-bold text-red-400 mb-8">
+          {{ sale.end_message }}
+        </div>
+
+        {% if sale.cta_url %}
+          <a href="{{ sale.cta_url }}"
+             class="inline-flex items-center justify-center rounded-full bg-primary text-odin-bg px-8 py-4 text-sm font-bold uppercase tracking-widest hover:bg-white transition-all hover:scale-105 shadow-[0_0_25px_rgba(16,185,129,0.4)]">
+            {{ sale.cta_label|default:"Get Tickets Now" }}
+          </a>
+        {% endif %}
       </div>
-
-      <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
-        <span class="font-display text-4xl md:text-6xl font-bold text-white" x-text="hours">00</span>
-        <span class="text-xs uppercase tracking-widest text-text-muted mt-2">Hours</span>
-      </div>
-
-      <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
-        <span class="font-display text-4xl md:text-6xl font-bold text-white" x-text="minutes">00</span>
-        <span class="text-xs uppercase tracking-widest text-text-muted mt-2">Mins</span>
-      </div>
-
-      <div class="glass-panel rounded-2xl p-6 flex flex-col items-center justify-center">
-        <span class="font-display text-4xl md:text-6xl font-bold text-primary" x-text="seconds">00</span>
-        <span class="text-xs uppercase tracking-widest text-text-muted mt-2">Secs</span>
-      </div>
-    </div>
-
-    <div x-show="expired" style="display: none;" class="text-2xl font-bold text-red-400 mb-8">
-      {{ self.end_message }}
-    </div>
-
-    {% if self.cta_url %}
-      <a href="{{ self.cta_url }}"
-         class="inline-flex items-center justify-center rounded-full bg-primary text-odin-bg px-8 py-4 text-sm font-bold uppercase tracking-widest hover:bg-white transition-all hover:scale-105 shadow-[0_0_25px_rgba(16,185,129,0.4)]">
-        {{ self.cta_label|default:"Get Tickets Now" }}
-      </a>
-    {% endif %}
-  </div>
-</section>
-{% endif %}
+    </section>
+  {% endif %}
+{% endwith %}

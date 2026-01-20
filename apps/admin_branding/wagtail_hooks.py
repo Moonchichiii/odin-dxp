@@ -114,6 +114,9 @@ class ClientQuickActionsPanel:
         footer_settings_url = (
             safe_reverse("wagtailsettings:edit", "cms_integration", "footersettings") or settings_index
         )
+        cookie_settings_url = (
+            safe_reverse("wagtailsettings:edit", "cms_integration", "cookiesettings") or settings_index
+        )
         flash_sale_url = safe_reverse("wagtailsettings:edit", "cms_integration", "flashsalesettings") or settings_index
 
         speakers_url = snippet_list_url("cms_integration", "speaker")
@@ -130,6 +133,7 @@ class ClientQuickActionsPanel:
             "flash_sale_url": flash_sale_url,
             "speakers_url": speakers_url,
             "partners_url": partners_url,
+            "cookie_settings_url": cookie_settings_url,
         }
 
         html = render_to_string("admin/odin_dashboard_panel.html", context=context, request=request)

@@ -1,0 +1,72 @@
+{% load wagtailcore_tags wagtailsettings_tags %}
+{% get_settings use_default_site=True %}
+{% with cookie=settings.cms_integration.CookieSettings %}
+
+{% if cookie.is_active %}
+<div
+    x-data="{
+        show: false,
+        init() {
+            if (!localStorage.getItem('odin_cookie_consent')) {
+                setTimeout(() => this.show = true, 1000);
+            }
+        },
+        accept() {
+            localStorage.setItem('odin_cookie_consent', 'accepted');
+            this.show = false;
+            window.dispatchEvent(new CustomEvent('cookie-consent-granted'));
+        },
+        decline() {
+            localStorage.setItem('odin_cookie_consent', 'declined');
+            this.show = false;
+        }
+    }"
+    x-show="show"
+    x-transition:enter="transition ease-out duration-500"
+    x-transition:enter-start="translate-y-full opacity-0"
+    x-transition:enter-end="translate-y-0 opacity-100"
+    x-transition:leave="transition ease-in duration-300"
+    x-transition:leave-start="translate-y-0 opacity-100"
+    x-transition:leave-end="translate-y-full opacity-0"
+    class="fixed bottom-6 left-6 z-[200] max-w-md w-[calc(100%-3rem)]"
+    style="display: none;"
+>
+    {# SOLID SURFACE (No glass) for maximum readability #}
+    <div class="p-6 rounded-2xl bg-[#0B1120] border border-white/10 shadow-[0_20px_50px_-12px_rgba(0,0,0,1)] relative overflow-hidden ring-1 ring-white/5">
+
+        {# Keep the Glow, but subtle #}
+        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-primary/10 blur-3xl rounded-full pointer-events-none"></div>
+
+        <h3 class="font-display text-lg font-bold text-white mb-3 relative z-10">
+            {{ cookie.title }} 🍪
+        </h3>
+
+        <p class="text-sm text-slate-300 mb-6 leading-relaxed relative z-10">
+            {{ cookie.message }}
+            {% if cookie.privacy_page or cookie.privacy_policy_url %}
+                <a href="{% if cookie.privacy_page %}{% pageurl cookie.privacy_page %}{% else %}{{ cookie.privacy_policy_url }}{% endif %}"
+                   class="text-primary hover:text-white underline decoration-primary/50 underline-offset-4 transition-colors font-medium whitespace-nowrap">
+                    Read Policy
+                </a>.
+            {% endif %}
+        </p>
+
+        <div class="flex gap-3 relative z-10">
+            <button
+                @click="accept()"
+                class="flex-1 bg-primary text-odin-bg text-sm font-bold uppercase tracking-wide py-3.5 rounded-full hover:bg-white transition-colors shadow-lg"
+            >
+                {{ cookie.accept_button_text }}
+            </button>
+            <button
+                @click="decline()"
+                class="flex-1 border border-white/15 text-slate-300 text-sm font-bold uppercase tracking-wide py-3.5 rounded-full hover:bg-white/5 hover:text-white transition-colors"
+            >
+                {{ cookie.decline_button_text }}
+            </button>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endwith %}

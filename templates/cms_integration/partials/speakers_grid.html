@@ -1,5 +1,5 @@
 {% for speaker in speakers %}
-  {% include "partials/cards/speaker_card.html" with speaker=speaker %}
+  {% include "cms_integration/partials/cards/speaker_card.html" with speaker=speaker %}
 {% empty %}
   <p class="text-text-muted">No speakers yet.</p>
 {% endfor %}

@@ -65,7 +65,7 @@
   --color-odin-border: #1e293b;
 
   /* Brand Colors */
-  --color-primary: #10b981;
+
   --color-primary-glow: #34d399;
   --color-primary-dim: #064e3b;
 
@@ -73,22 +73,47 @@
   --color-text-main: #f8fafc;
   --color-text-muted: #94a3b8;
 
+  --color-primary: #10b981;
+  --color-primary-glow: #818cf8;
+  --color-primary-dim: #312e81;
+
+  /* Text Colors: High Contrast, No Gradients */
+  --color-text-main: #ffffff; /* Pure White for headings */
+  --color-text-body: #e4e4e7; /* Zinc 200 for body */
+  --color-text-muted: #a1a1aa; /* Zinc 400 for metadata */
+
   /* --- ANIMATIONS --- */
   --animate-fade-in-up: fadeInUp 0.8s ease-out forwards;
   --animate-glow-pulse: glowPulse 4s ease-in-out infinite;
   --animate-float: float 6s ease-in-out infinite;
 
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
   @keyframes glowPulse {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 0.6; }
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.6;
+    }
   }
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
   }
 }
 
@@ -99,7 +124,12 @@
   }
 
   .bg-hero-vignette {
-    background: radial-gradient(circle at center, transparent 0%, rgba(2, 6, 23, 0.4) 60%, #020617 100%);
+    background: radial-gradient(
+      circle at center,
+      transparent 0%,
+      rgba(2, 6, 23, 0.4) 60%,
+      #020617 100%
+    );
   }
 
   .glass-panel {
@@ -109,7 +139,9 @@
 
 /* --- BASE STYLES --- */
 @layer base {
-  [x-cloak] { display: none !important; }
+  [x-cloak] {
+    display: none !important;
+  }
 
   :focus-visible {
     outline: 2px solid var(--color-primary-glow);
@@ -124,7 +156,12 @@
     @apply bg-odin-bg text-text-main font-sans antialiased selection:bg-primary-dim selection:text-primary-glow;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display font-bold tracking-tight text-white;
   }
 
@@ -152,4 +189,141 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sponsor-tilt {
+  perspective: 900px;
+}
+
+.sponsor-card {
+  position: relative;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  overflow: hidden;
+  transform-style: preserve-3d;
+  transition:
+    transform 260ms ease,
+    border-color 260ms ease,
+    background 260ms ease;
+}
+
+.sponsor-card::before {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(16, 185, 129, 0.22),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 80% 60%,
+      rgba(255, 255, 255, 0.1),
+      transparent 60%
+    );
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.sponsor-glass {
+  position: relative;
+  padding: 22px;
+  border-radius: 28px;
+  transform: translateZ(20px);
+}
+
+.sponsor-logo {
+  height: 92px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+}
+
+.sponsor-logo-img {
+  max-height: 92px;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+  opacity: 0.85;
+  transition:
+    opacity 220ms ease,
+    transform 260ms ease,
+    filter 260ms ease;
+  filter: grayscale(100%);
+}
+
+.sponsor-meta {
+  text-align: center;
+}
+
+.sponsor-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+  transition: color 220ms ease;
+}
+
+.sponsor-tier {
+  margin-top: 6px;
+  font-size: 0.65rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(16, 185, 129, 0.7);
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+}
+
+.sponsor-corner {
+  position: absolute;
+  right: -40px;
+  top: -40px;
+  width: 120px;
+  height: 120px;
+  border-radius: 40px;
+  background: rgba(16, 185, 129, 0.14);
+  transform: rotate(12deg);
+  transition:
+    transform 260ms ease,
+    opacity 260ms ease;
+  opacity: 0.35;
+}
+
+.sponsor-tilt:hover .sponsor-card {
+  transform: rotateX(10deg) rotateY(-10deg) translateY(-4px);
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sponsor-tilt:hover .sponsor-card::before {
+  opacity: 1;
+}
+
+.sponsor-tilt:hover .sponsor-logo-img {
+  opacity: 1;
+  transform: translateZ(10px) scale(1.02);
+  filter: grayscale(0%);
+}
+
+.sponsor-tilt:hover .sponsor-name {
+  color: rgba(255, 255, 255, 1);
+}
+
+.sponsor-tilt:hover .sponsor-corner {
+  transform: rotate(12deg) translateY(6px) translateX(-6px);
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sponsor-card,
+  .sponsor-card::before,
+  .sponsor-logo-img,
+  .sponsor-corner {
+    transition: none !important;
+  }
+  .sponsor-tilt:hover .sponsor-card {
+    transform: none;
+  }
 }

@@ -53,6 +53,14 @@
             </a>
         {% endif %}
 
+                {# 2.5 Flash Sale (Global) #}
+        {% if flash_sale_url %}
+            <a class="button" href="{{ flash_sale_url }}" style="border-color: #ef4444; color: #ef4444;">
+                {% icon name="time" %} Flash Sale
+            </a>
+        {% endif %}
+
+
         {# 3. Data / Snippets #}
         {% if speakers_url %}
             <a class="button" href="{{ speakers_url }}">
@@ -63,6 +71,13 @@
         {% if partners_url %}
             <a class="button" href="{{ partners_url }}">
                 {% icon name="group" %} Sponsors
+            </a>
+        {% endif %}
+
+        {# 4. Cookie Settings #}
+        {% if cookie_settings_url %}
+            <a class="button" href="{{ cookie_settings_url }}">
+                {% icon name="locked" %} Privacy & Cookies
             </a>
         {% endif %}
     </div>

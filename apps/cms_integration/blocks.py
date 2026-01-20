@@ -36,52 +36,56 @@ class HeroBlock(blocks.StructBlock):
     Full-screen hero section with video background and centered text.
     """
 
-    title = blocks.CharBlock(required=True, help_text="Main headline (H1). Keep it punchy.", default="The Future of AI")
+    title = blocks.CharBlock(
+        required=True,
+        label="Main Headline (H1)",
+        help_text="The big, punchy text in the center.",
+        default="The Future of AI",
+    )
+
+    # Keep existing field, but reframe it for the client
     subtitle = blocks.CharBlock(
         required=False,
-        help_text="Gradient text below the headline (optional).",
+        label="Lead (Legacy / Optional)",
+        help_text="Fallback lead text shown above the H1 if 'Lead paragraph' is empty.",
     )
+
+    # IMPORTANT: if you're now using description as the main paragraph below H1,
+    # update label + help text, but keep the field name.
     description = blocks.TextBlock(
-        required=False, help_text="Small uppercase text above the headline (e.g., 'OCTOBER 2026 • AMSTERDAM')."
+        required=False,
+        label="Main paragraph (Below H1)",
+        help_text="The first paragraph under the headline (gradient style).",
     )
 
-    # Media
-    video_public_id = blocks.CharBlock(
+    lead = blocks.CharBlock(
         required=False,
-        label="Cloudinary Video ID",
-        help_text="The 'Public ID' from Cloudinary (e.g., 'odin/hero-bg'). Optimized for streaming.",
-    )
-    poster_public_id = blocks.CharBlock(
-        required=False,
-        label="Cloudinary Poster ID",
-        help_text="Image ID to show while video loads (e.g., 'odin/hero-poster').",
+        label="Lead paragraph (Above H1)",
+        help_text="Short kicker shown in the top/brain area above the headline (preferred).",
     )
 
-    # Fallback Uploads
-    video_upload = DocumentChooserBlock(
+    paragraphs = blocks.ListBlock(
+        blocks.CharBlock(required=True, max_length=220),
         required=False,
-        label="Upload Video (Fallback)",
-        help_text="Upload MP4 if not using Cloudinary ID.",
-    )
-    poster_upload = ImageChooserBlock(
-        required=False,
-        label="Upload Poster (Fallback)",
-        help_text="Upload an image if not using Cloudinary ID.",
+        label="Extra paragraphs (Below main paragraph)",
+        help_text="Optional extra lines under the main paragraph (smaller white text).",
     )
 
-    # Extra visual elements
+    # Media (unchanged)
+    video_public_id = blocks.CharBlock(required=False, label="Cloudinary Video ID", help_text="...")
+    poster_public_id = blocks.CharBlock(required=False, label="Cloudinary Poster ID", help_text="...")
+
+    video_upload = DocumentChooserBlock(required=False, label="Upload Video (Fallback)", help_text="...")
+    poster_upload = ImageChooserBlock(required=False, label="Upload Poster (Fallback)", help_text="...")
+
     extra_images = blocks.ListBlock(
         ImageChooserBlock(),
         required=False,
-        label="Floating Logos",
-        help_text="Add sponsor logos or badges to float above the title.",
+        label="Brain/Logo Image",
+        help_text="If set, this replaces the lead text at the very top.",
     )
 
-    cta_buttons = blocks.ListBlock(
-        HeroCtaBlock(),
-        required=False,
-        label="Call to Action Buttons",
-    )
+    cta_buttons = blocks.ListBlock(HeroCtaBlock(), required=False, label="Call to Action Buttons")
 
     class Meta:
         template = "cms_integration/blocks/hero_block.html"

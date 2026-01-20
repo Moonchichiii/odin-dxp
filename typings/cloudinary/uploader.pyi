@@ -1,0 +1,3 @@
+from typing import Any, Mapping
+
+def upload(file: Any, **options: Any) -> Mapping[str, Any]: ...

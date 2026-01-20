@@ -4,7 +4,7 @@
   class="hero-section relative w-full h-dvh min-h-[700px] flex flex-col overflow-hidden bg-odin-bg"
   aria-labelledby="hero-title"
 >
-  {# -------------------- 1. BACKGROUND LAYER -------------------- #}
+  {# -------------------- 1. BACKGROUND LAYER (UNCHANGED) -------------------- #}
   <div class="absolute inset-0 z-0 select-none">
     {% if self.video_public_id %}
       <video
@@ -15,7 +15,6 @@
       >
         <source src="{% cld_video self.video_public_id width=1600 %}" type="video/mp4" />
       </video>
-
     {% elif self.video_upload and self.video_upload.url %}
       <video
         class="absolute inset-0 h-full w-full object-cover object-center opacity-60 scale-105"
@@ -25,13 +24,12 @@
       >
         <source src="{{ self.video_upload.url }}" type="video/mp4" />
       </video>
-
     {% else %}
       <div class="absolute inset-0 bg-linear-to-br from-odin-surface to-odin-bg"></div>
     {% endif %}
   </div>
 
-  {# -------------------- 2. OVERLAYS -------------------- #}
+  {# -------------------- 2. OVERLAYS (UNCHANGED) -------------------- #}
   <div class="absolute inset-0 z-10 pointer-events-none bg-hero-vignette"></div>
   <div class="absolute inset-x-0 bottom-0 h-40 z-10 pointer-events-none bg-linear-to-t from-odin-bg to-transparent"></div>
 
@@ -40,7 +38,8 @@
 
     <div class="w-full max-w-7xl mx-auto flex flex-col items-center text-center">
 
-      {# --- A. THE BRAIN --- #}
+      {# --- A. THE BRAIN / LEAD AREA --- #}
+      {# UPDATE: Now supports 'lead' field, falls back to 'subtitle' if lead is empty (Legacy support) #}
       <div class="mb-4 md:mb-8 animate-fade-in-up" style="animation-delay: 0.1s">
         {% if self.extra_images %}
           <div class="flex justify-center items-center gap-6">
@@ -59,10 +58,15 @@
               {% endif %}
             {% endfor %}
           </div>
-        {% elif self.description %}
-          <p class="font-mono text-xs md:text-sm uppercase tracking-[0.2em] text-primary-glow font-bold drop-shadow-md">
-            {{ self.description }}
-          </p>
+        {% else %}
+          {# Fallback: If no image, show lead text (or legacy subtitle) here #}
+          {% with top_text=self.lead|default:self.subtitle %}
+            {% if top_text %}
+              <p class="font-mono text-xs md:text-sm uppercase tracking-[0.2em] text-primary-glow font-bold drop-shadow-md">
+                {{ top_text }}
+              </p>
+            {% endif %}
+          {% endwith %}
         {% endif %}
       </div>
 
@@ -74,7 +78,7 @@
           leading-[1.1] md:leading-[1.0] tracking-tight
           drop-shadow-2xl
           max-w-6xl mx-auto
-          mb-6 md:mb-10
+          mb-4 md:mb-6
           animate-fade-in-up
         "
         style="
@@ -83,18 +87,38 @@
         "
       >
         {{ self.title }}
-
-        {% if self.subtitle %}
-          <span
-            class="block mt-2 md:mt-6 font-normal font-sans tracking-normal text-transparent bg-clip-text bg-linear-to-r from-text-muted via-white to-text-muted max-w-3xl mx-auto"
-            style="font-size: clamp(0.875rem, 1.5vw, 1.5rem);"
-          >
-            {{ self.subtitle }}
-          </span>
-        {% endif %}
       </h1>
 
-      {# --- C. CTA BUTTONS --- #}
+      {# --- C. TEXT UNDER HEADLINE --- #}
+      {# Uses 'description' (Legacy) as main paragraph + 'paragraphs' (New) for extras #}
+      {% if self.description or self.paragraphs %}
+        <div class="max-w-3xl mx-auto mb-6 md:mb-10 animate-fade-in-up" style="animation-delay: 0.25s">
+
+          {# Main Paragraph (Gradient Style) #}
+          {% if self.description %}
+            <p
+              class="font-normal font-sans tracking-normal text-transparent bg-clip-text bg-linear-to-r from-text-muted via-white to-text-muted block"
+              style="font-size: clamp(0.875rem, 1.5vw, 1.5rem);"
+            >
+              {{ self.description }}
+            </p>
+          {% endif %}
+
+          {# Extra Paragraphs (Clean White Style) #}
+          {% if self.paragraphs %}
+            <div class="mt-4 space-y-3">
+              {% for line in self.paragraphs %}
+                <p class="text-sm md:text-base text-white/80 leading-relaxed font-medium">
+                  {{ line }}
+                </p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+        </div>
+      {% endif %}
+
+      {# --- D. CTA BUTTONS (UNCHANGED) --- #}
       {% if self.cta_buttons %}
         <div class="flex flex-col md:flex-row flex-wrap items-center justify-center gap-3 md:gap-6 w-full md:w-auto animate-fade-in-up" style="animation-delay: 0.4s">
           {% for item in self.cta_buttons %}
@@ -135,8 +159,7 @@
     </div>
   </div>
 
-  {# --- 4. SCROLL INDICATOR --- #}
-  {# TWEAK: bottom-4 (Mobile) -> bottom-8 (Desktop) -> bottom-12 (Ultra-Wide) #}
+  {# --- 4. SCROLL INDICATOR (UNCHANGED) --- #}
   <button
     @click="window.scrollBy({ top: window.innerHeight, behavior: 'smooth' })"
     class="absolute bottom-4 lg:bottom-8 2xl:bottom-12 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-2 animate-float opacity-50 hover:opacity-100 transition-opacity cursor-pointer mix-blend-screen"

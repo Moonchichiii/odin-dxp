@@ -8,6 +8,7 @@ from wagtail.admin.panels import FieldPanel, MultiFieldPanel
 from wagtail.contrib.settings.models import BaseSiteSetting, register_setting
 from wagtail.fields import StreamField
 from wagtail.images import get_image_model_string
+from wagtail.models import Page
 
 
 class LinkBlock(blocks.StructBlock):
@@ -238,3 +239,54 @@ class FlashSaleSettings(BaseSiteSetting):
 
     class Meta:
         verbose_name = "Flash Sale Configuration"
+
+
+@register_setting(icon="locked", order=130)
+class CookieSettings(BaseSiteSetting):
+    is_active: models.BooleanField = models.BooleanField(
+        default=True,
+        verbose_name="Enable Cookie Banner",
+        help_text="Show the consent banner to new visitors.",
+    )
+    title: models.CharField = models.CharField(default="We value your privacy", max_length=100)
+    message: models.TextField = models.TextField(
+        default=(
+            "We use cookies to enhance your browsing experience, serve personalized ads or content, "
+            "and analyze our traffic."
+        )
+    )
+    accept_button_text: models.CharField = models.CharField(default="Accept All", max_length=50)
+    decline_button_text: models.CharField = models.CharField(default="Decline", max_length=50)
+
+    # Links to legal pages
+    privacy_page: models.ForeignKey = models.ForeignKey(
+        Page,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
+    privacy_policy_url: models.URLField = models.URLField(blank=True, help_text="External link if page not selected")
+
+    panels = [
+        FieldPanel("is_active"),
+        FieldPanel("title"),
+        FieldPanel("message"),
+        MultiFieldPanel(
+            [
+                FieldPanel("accept_button_text"),
+                FieldPanel("decline_button_text"),
+            ],
+            heading="Buttons",
+        ),
+        MultiFieldPanel(
+            [
+                FieldPanel("privacy_page"),
+                FieldPanel("privacy_policy_url"),
+            ],
+            heading="Legal Link",
+        ),
+    ]
+
+    class Meta:
+        verbose_name = "Cookie Consent Settings"
