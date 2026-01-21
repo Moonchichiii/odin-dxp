@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="dark light" />
 
-    {# --- RESTORED TITLE LOGIC --- #}
+    {# --- TITLE LOGIC (SEO-safe, CMS-driven) --- #}
     <title>
       {% block title %}
         {% if page and page.seo_title %}
@@ -24,7 +24,7 @@
       {% endblock %}
     </title>
 
-    {# --- RESTORED META TAGS --- #}
+    {# --- META TAGS --- #}
     <meta
       name="description"
       content="{% block meta_description %}{% if page %}{{ page.search_description|default:'Event Intelligence Platform by DXP Odin.' }}{% else %}Event Intelligence Platform by DXP Odin.{% endif %}{% endblock %}"
@@ -33,6 +33,7 @@
     <meta name="robots" content="{% block robots %}index,follow,max-image-preview:large{% endblock %}" />
     <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}" />
 
+    {# --- OPEN GRAPH --- #}
     <meta property="og:site_name" content="{% block og_site_name %}{{ request.site.site_name|default:"DXP Odin" }}{% endblock %}" />
     <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
     <meta property="og:title" content="{% block og_title %}{% if page and page.seo_title %}{{ page.seo_title }}{% elif page and page.title %}{{ page.title }}{% else %}DXP Odin{% endif %}{% endblock %}" />
@@ -54,6 +55,7 @@
 
     <meta name="twitter:card" content="{% block twitter_card %}summary_large_image{% endblock %}" />
 
+    {# --- STRUCTURED DATA --- #}
     {% block json_ld %}
       <script type="application/ld+json">
         {
@@ -74,35 +76,44 @@
     <link rel="apple-touch-icon" href="{% static 'icons/apple-touch-icon.png' %}" />
     <link rel="manifest" href="{% static 'icons/site.webmanifest' %}" />
 
+    {# --- PERFORMANCE: THIRD-PARTY PRECONNECTS --- #}
     <link rel="preconnect" href="https://res.cloudinary.com" crossorigin />
     <link rel="preconnect" href="https://player.cloudinary.com" crossorigin />
 
-    {# --- FONTS & CSS --- #}
+    {# --- FONTS & STYLES --- #}
     <link rel="preload" href="{% static 'fonts/Satoshi-Regular.woff2' %}" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="{% static 'fonts/ClashDisplay-Bold.woff2' %}" as="font" type="font/woff2" crossorigin />
-
     <link rel="stylesheet" href="{% static 'css/tailwind.css' %}" />
 
+    {# --- CONTROL MANUAL SCROLL RESTORATION --- #}
     <script>
       if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     </script>
 
+    {# --- CORE JS LIBRARIES --- #}
     <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+
+    {# GSAP must load globally before Alpine bundle #}
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
+    {# Compiled Alpine + site logic (includes GSAP carousel init) #}
     <script src="{% static 'dist/alpine.js' %}" defer></script>
 
     {% block extra_head %}{% endblock %}
   </head>
 
-  {# --- BODY UPDATE: Only changing classes here to match new CSS --- #}
+  {# --- BODY --- #}
   <body
     class="flex flex-col h-full min-h-screen bg-odin-bg text-text-main font-sans selection:bg-primary selection:text-odin-bg overflow-x-hidden"
     hx-boost="true"
     hx-indicator="#global-loading"
   >
-    {# --- Global Loading Bar (HTMX) --- #}
-    {% comment %} <div id="global-loading" class="fixed top-0 left-0 w-full h-1 bg-primary z-100 transition-opacity duration-300 htmx-indicator"></div> {% endcomment %}
-{# Was missing opacity-0 #}
-<div id="global-loading" class="fixed top-0 left-0 w-full h-1 bg-primary z-100 opacity-0 transition-opacity duration-300 htmx-indicator"></div>
+    {# --- GLOBAL HTMX LOADING INDICATOR --- #}
+    <div
+      id="global-loading"
+      class="fixed top-0 left-0 w-full h-1 bg-primary z-100 opacity-0 transition-opacity duration-300 htmx-indicator"
+    ></div>
+
     <a
       href="#main-content"
       class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-200
@@ -130,9 +141,11 @@
 
     {% block extra_body %}{% endblock %}
 
+    {# --- VIEWPORT HEIGHT FIX (MOBILE SAFE) --- #}
     <script>
       (() => {
-        const set = () => document.documentElement.style.setProperty("--app-vh", `${window.innerHeight}px`);
+        const set = () =>
+          document.documentElement.style.setProperty("--app-vh", `${window.innerHeight}px`);
         set();
         addEventListener("resize", set, { passive: true });
         addEventListener("orientationchange", set, { passive: true });

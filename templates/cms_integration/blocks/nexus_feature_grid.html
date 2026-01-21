@@ -1,0 +1,103 @@
+{% load wagtailcore_tags wagtailimages_tags cloudinary_helper %}
+
+<section class="relative py-24 bg-odin-bg border-t border-odin-border overflow-hidden">
+
+  <!-- Ambient Glow (Optional ambience) -->
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+    <div class="absolute -top-[20%] -right-[10%] w-[50vw] h-[50vw] bg-primary-dim/20 rounded-full blur-3xl opacity-30"></div>
+    <div class="absolute top-[40%] -left-[10%] w-[40vw] h-[40vw] bg-purple-900/20 rounded-full blur-3xl opacity-30"></div>
+  </div>
+
+  <div class="container mx-auto px-6 relative z-10">
+
+    {% if self.title %}
+      <div class="text-center mb-20">
+        <h2 class="font-display text-4xl md:text-5xl font-bold text-white tracking-tight">
+          {{ self.title }}
+        </h2>
+        <div class="h-1 w-24 bg-gradient-to-r from-primary to-transparent mx-auto mt-6 rounded-full"></div>
+      </div>
+    {% endif %}
+
+    <div class="flex flex-col gap-24 lg:gap-32">
+      {% for feature in self.features %}
+
+        <div class="group flex flex-col lg:flex-row {% cycle 'lg:flex-row' 'lg:flex-row-reverse' %} items-center gap-12 lg:gap-20">
+
+          <!-- IMAGE COLUMN -->
+          <div class="w-full lg:w-1/2 relative perspective-1000">
+            <div class="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-black/50 group-hover:shadow-primary/10 transition-shadow duration-500 bg-odin-surface">
+
+              <div class="aspect-[4/3] w-full relative">
+
+                {% if feature.image_public_id %}
+                  <img
+                    srcset="{% cld_srcset feature.image_public_id aspect_ratio='4:3' %}"
+                    src="{% cld_img feature.image_public_id width=800 height=600 gravity='auto' %}"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    alt="{{ feature.headline }}"
+                    loading="lazy"
+                    decoding="async"
+                    class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                {% elif feature.image_upload %}
+                  {% image feature.image_upload fill-800x600 class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt=feature.headline loading="lazy" decoding="async" %}
+                {% else %}
+                  <div class="absolute inset-0 flex items-center justify-center bg-odin-surface-hover">
+                    <span class="text-white/20 font-mono">No Image</span>
+                  </div>
+                {% endif %}
+
+                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60"></div>
+              </div>
+            </div>
+
+            <div class="absolute -bottom-4 -right-4 w-24 h-24 border-r-2 border-b-2 border-primary/30 rounded-br-3xl -z-10 group-hover:translate-x-2 group-hover:translate-y-2 transition-transform duration-500"></div>
+          </div>
+
+          <!-- TEXT COLUMN -->
+          <div class="w-full lg:w-1/2">
+            <div class="relative">
+
+              {% if feature.tagline %}
+                <div class="flex items-center gap-3 mb-4">
+                  <span class="h-px w-8 bg-primary"></span>
+                  <span class="text-primary font-mono text-xs uppercase tracking-widest font-bold">
+                    {{ feature.tagline }}
+                  </span>
+                </div>
+              {% endif %}
+
+              <h3 class="font-display text-3xl md:text-4xl font-bold text-white mb-6 leading-tight">
+                {{ feature.headline }}
+              </h3>
+
+              <div class="prose prose-lg prose-invert text-text-muted mb-8 text-balance">
+                {{ feature.description|richtext }}
+              </div>
+
+              {% if feature.cta_url %}
+                <a
+                  href="{{ feature.cta_url }}"
+                  class="inline-flex items-center gap-2 group/btn relative overflow-hidden px-8 py-3 rounded-full bg-white/5 border border-white/10 hover:bg-primary hover:border-primary transition-all duration-300"
+                >
+                  <span class="relative z-10 font-bold text-sm tracking-wide text-white group-hover/btn:text-odin-bg transition-colors">
+                    {{ feature.cta_label|default:"Learn More" }}
+                  </span>
+                  <svg class="relative z-10 w-4 h-4 text-white group-hover/btn:text-odin-bg transition-transform duration-300 group-hover/btn:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
+                  <div class="absolute inset-0 bg-primary opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300"></div>
+                </a>
+              {% endif %}
+
+            </div>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>

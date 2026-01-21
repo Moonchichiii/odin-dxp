@@ -3,7 +3,7 @@ from __future__ import annotations
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from .snippets import Partner, Speaker
+from .snippets import Partner, Speaker, Sponsor
 
 
 def home(request: HttpRequest) -> HttpResponse:
@@ -15,12 +15,12 @@ def hx_ping(request: HttpRequest) -> HttpResponse:
 
 
 def hx_sponsors(request: HttpRequest) -> HttpResponse:
-    partners = (
-        Partner.objects.select_related("logo_upload")
+    sponsors = (
+        Sponsor.objects.select_related("logo_upload")
         .only("name", "logo_public_id", "website", "tier", "logo_upload")
-        .order_by("name")
+        .order_by("tier", "name")
     )
-    return render(request, "cms_integration/partials/sponsors_grid.html", {"partners": partners})
+    return render(request, "cms_integration/partials/sponsors_grid.html", {"sponsors": sponsors})
 
 
 def hx_speakers(request: HttpRequest) -> HttpResponse:
@@ -39,3 +39,12 @@ def hx_speakers(request: HttpRequest) -> HttpResponse:
         .order_by("-is_keynote", "name")
     )
     return render(request, "cms_integration/partials/speakers_grid.html", {"speakers": speakers})
+
+
+def hx_partners(request: HttpRequest) -> HttpResponse:
+    partners = (
+        Partner.objects.select_related("logo_upload")
+        .only("name", "slug", "type", "logo_public_id", "website", "logo_upload")
+        .order_by("type", "name")
+    )
+    return render(request, "cms_integration/partials/partners_grid.html", {"partners": partners})

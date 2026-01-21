@@ -16,21 +16,27 @@ from .blocks import (
     CountdownBlock,
     FAQSectionBlock,
     HeroBlock,
-    PartnerGridBlock,
+    NexusGridBlock,
+    PartnerCarouselBlock,
     SpeakerGridBlock,
+    SponsorGridBlock,
     TestimonialGridBlock,
 )
 from .mixins import SEOAttributes
-from .snippets import Partner, Speaker
+from .snippets import Partner, Speaker, Sponsor
+
+# ---------------------------------------------------------------------
+# SPEAKERS
+# ---------------------------------------------------------------------
 
 
 class SpeakersIndexPage(RoutablePageMixin, Page):
     """
-    Logic for /speakers/ and /speakers/{slug}/
+    /speakers/ and /speakers/{slug}/
     """
 
     template = "cms_integration/speakers_index.html"
-    subpage_types: list[str] = []  # No child pages allowed
+    subpage_types: list[str] = []
 
     def get_context(self, request: HttpRequest, *args: Any, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context(request, *args, **kwargs)
@@ -40,12 +46,21 @@ class SpeakersIndexPage(RoutablePageMixin, Page):
     @route(r"^(?P<slug>[-\w]+)/$")
     def speaker_detail(self, request: HttpRequest, slug: str) -> HttpResponse:
         speaker = get_object_or_404(Speaker, slug=slug)
-        return render(request, "cms_integration/speaker_detail.html", {"page": self, "speaker": speaker})
+        return render(
+            request,
+            "cms_integration/speaker_detail.html",
+            {"page": self, "speaker": speaker},
+        )
+
+
+# ---------------------------------------------------------------------
+# SPONSORS (COMMERCIAL / TIERED)
+# ---------------------------------------------------------------------
 
 
 class SponsorsIndexPage(RoutablePageMixin, Page):
     """
-    Logic for /sponsors/ and /sponsors/{slug}/
+    /sponsors/ and /sponsors/{slug}/
     """
 
     template = "cms_integration/sponsors_index.html"
@@ -53,13 +68,50 @@ class SponsorsIndexPage(RoutablePageMixin, Page):
 
     def get_context(self, request: HttpRequest, *args: Any, **kwargs: Any) -> dict[str, Any]:
         ctx = super().get_context(request, *args, **kwargs)
-        ctx["sponsors"] = Partner.objects.order_by("tier", "name")
+        ctx["sponsors"] = Sponsor.objects.order_by("tier", "name")
         return ctx
 
     @route(r"^(?P<slug>[-\w]+)/$")
     def sponsor_detail(self, request: HttpRequest, slug: str) -> HttpResponse:
-        sponsor = get_object_or_404(Partner, slug=slug)
-        return render(request, "cms_integration/sponsor_detail.html", {"page": self, "sponsor": sponsor})
+        sponsor = get_object_or_404(Sponsor, slug=slug)
+        return render(
+            request,
+            "cms_integration/sponsor_detail.html",
+            {"page": self, "sponsor": sponsor},
+        )
+
+
+# ---------------------------------------------------------------------
+# PARTNERS (NON-COMMERCIAL / COMMUNITY)
+# ---------------------------------------------------------------------
+
+
+class PartnersIndexPage(RoutablePageMixin, Page):
+    """
+    /partners/ and /partners/{slug}/
+    """
+
+    template = "cms_integration/partners_index.html"
+    subpage_types: list[str] = []
+
+    def get_context(self, request: HttpRequest, *args: Any, **kwargs: Any) -> dict[str, Any]:
+        ctx = super().get_context(request, *args, **kwargs)
+        ctx["partners"] = Partner.objects.order_by("type", "name")
+        return ctx
+
+    @route(r"^(?P<slug>[-\w]+)/$")
+    def partner_detail(self, request: HttpRequest, slug: str) -> HttpResponse:
+        partner = get_object_or_404(Partner, slug=slug)
+        return render(
+            request,
+            "cms_integration/partner_detail.html",
+            {"page": self, "partner": partner},
+        )
+
+
+# ---------------------------------------------------------------------
+# HOME PAGE
+# ---------------------------------------------------------------------
 
 
 class HomePage(SEOAttributes, Page):
@@ -74,19 +126,32 @@ class HomePage(SEOAttributes, Page):
             ("countdown", CountdownBlock()),
             ("content_section", ContentBlock()),
             ("testimonial_grid", TestimonialGridBlock()),
+            ("nexus_grid", NexusGridBlock()),
             ("speaker_grid", SpeakerGridBlock()),
-            ("partner_grid", PartnerGridBlock()),
+            ("sponsor_section", SponsorGridBlock()),  # Commercial / Tiered
+            ("partner_carousel", PartnerCarouselBlock()),  # GSAP 3D Carousel
             ("faq_section", FAQSectionBlock()),
         ],
         use_json_field=True,
         collapsed=True,
     )
 
-    # Schema Data (For Google/AI)
-    event_start_date = models.DateTimeField(null=True, blank=True, help_text="For Google Event Schema")
-    event_end_date = models.DateTimeField(null=True, blank=True, help_text="For Google Event Schema")
+    # Event Schema (SEO / AI / Google)
+    event_start_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="For Google Event Schema",
+    )
+    event_end_date = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="For Google Event Schema",
+    )
     event_location = models.CharField(
-        max_length=255, blank=True, default="Amsterdam", help_text="City/Venue for Schema"
+        max_length=255,
+        blank=True,
+        default="Amsterdam",
+        help_text="City / Venue for Schema",
     )
 
     content_panels = Page.content_panels + [

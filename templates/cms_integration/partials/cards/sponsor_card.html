@@ -2,15 +2,20 @@
 
 <a
   href="{{ sponsor.website|default:'#' }}"
-  class="sponsor-tilt group block"
+  class="sponsor-tilt group block h-full"
   {% if sponsor.website %}target="_blank" rel="noopener"{% endif %}
 >
   <div class="sponsor-card">
-    <div class="sponsor-glass">
-      <div class="sponsor-logo">
+    <!-- 1. The Glass Layer (Background frosting) -->
+    <div class="sponsor-glass-pane"></div>
+
+    <!-- 2. The Content Layer (Floats above glass) -->
+    <div class="sponsor-content">
+
+      <!-- Logo Container -->
+      <div class="sponsor-logo-wrapper">
         {% if sponsor.logo_upload %}
           {% image sponsor.logo_upload max-520x220 class="sponsor-logo-img" alt=sponsor.name loading="lazy" decoding="async" %}
-
         {% elif sponsor.logo_public_id %}
           <img
             src="{% cld_img sponsor.logo_public_id width=520 height=220 gravity='auto' %}"
@@ -20,18 +25,31 @@
             decoding="async"
           />
         {% else %}
-          <div class="text-text-muted text-xs">No logo</div>
+          <div class="text-xs font-mono text-white/40">No logo</div>
         {% endif %}
       </div>
 
+      <!-- Text Meta -->
       <div class="sponsor-meta">
         <p class="sponsor-name">{{ sponsor.name }}</p>
         {% if sponsor.tier %}
           <p class="sponsor-tier">{{ sponsor.tier }}</p>
         {% endif %}
       </div>
-    </div>
 
-    <div class="sponsor-corner" aria-hidden="true"></div>
+      <!-- Visit Icon: HIDDEN by default, floats high on hover -->
+      {% if sponsor.website %}
+      <div class="visit-btn">
+        <div class="visit-btn-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
   </div>
 </a>

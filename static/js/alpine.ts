@@ -214,3 +214,378 @@ document.addEventListener("DOMContentLoaded", () => {
   bindHeader();
   initAnalytics();
 });
+
+/* ================================
+   GSAP Arc Carousel (CMS-safe)
+   ================================ */
+
+type MousePos = { x: number; y: number };
+
+const lerp = (start: number, end: number, amt: number) =>
+  (1 - amt) * start + amt * end;
+
+const prefersReducedMotion = () =>
+  window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+
+class ArcSliderItem {
+  DOM: { el: HTMLElement; layers: NodeListOf<HTMLElement> };
+  index: number;
+  length: number;
+  extra: number;
+
+  width = 320;
+  height = 420;
+  padding = 40;
+  widthTotal = 0;
+  x = 0;
+  r = 0;
+
+  hover = false;
+
+  rendered = {
+    txPrev: 0,
+    tyPrev: 0,
+    txCur: 0,
+    tyCur: 0,
+  };
+
+  constructor(el: HTMLElement, index: number, length: number) {
+    this.DOM = {
+      el,
+      layers: el.querySelectorAll<HTMLElement>(".slider-layer"),
+    };
+
+    this.DOM.layers.forEach((layer) => {
+      if (!layer.dataset.range) layer.dataset.range = "0";
+    });
+
+    this.index = index;
+    this.length = length;
+    this.extra = 0;
+
+    this.initEvents();
+  }
+
+  initEvents() {
+    this.DOM.el.addEventListener("mouseenter", () => (this.hover = true));
+    this.DOM.el.addEventListener("mouseleave", () => {
+      this.hover = false;
+      this.rendered.txPrev = 0;
+      this.rendered.tyPrev = 0;
+
+      // reset layers smoothly
+      this.DOM.layers.forEach((layer) => {
+        gsap.to(layer, { duration: 0.45, x: 0, y: 0, ease: "power2.out" });
+      });
+    });
+  }
+
+  onResize(viewportWidth: number) {
+    this.width = viewportWidth < 768 ? 240 : 320;
+    this.height = viewportWidth < 768 ? 320 : 420;
+    this.padding = 40;
+
+    this.widthTotal = (this.width + this.padding) * this.length;
+    this.x = (this.width + this.padding) * this.index;
+
+    // bigger = flatter arc
+    this.r = viewportWidth * 2;
+
+    this.DOM.el.style.width = `${this.width}px`;
+    this.DOM.el.style.height = `${this.height}px`;
+    this.DOM.el.style.marginTop = `${-this.height / 2}px`;
+    this.DOM.el.style.marginLeft = `${-this.width / 2}px`;
+
+    this.extra = 0;
+  }
+
+  update(
+    scrollCurrent: number,
+    direction: "left" | "right",
+    viewportWidth: number,
+    viewportHeight: number,
+    mousepos: MousePos,
+    isMobile: boolean,
+  ) {
+    const n = this.x - scrollCurrent - this.extra;
+
+    let h = Math.asin(n / this.r) * (180 / Math.PI);
+
+    if (Number.isNaN(h)) {
+      this.DOM.el.style.opacity = "0";
+      h = 0;
+    } else {
+      this.DOM.el.style.opacity = "1";
+    }
+
+    const a = this.r - Math.cos((h * Math.PI) / 180) * this.r;
+
+    // arc + slight rotation
+    this.DOM.el.style.transform = `translate3d(${n}px, ${a}px, 0) rotate(${h * 0.5}deg)`;
+
+    // infinite loop boundaries
+    const cardBuffer = this.width * 2;
+    const boundary = viewportWidth / 2 + cardBuffer;
+
+    const isBefore = n < -boundary;
+    const isAfter = n > boundary;
+
+    if (direction === "right" && isBefore) {
+      this.extra -= this.widthTotal;
+    } else if (direction === "left" && isAfter) {
+      this.extra += this.widthTotal;
+    }
+
+    // parallax hover (desktop only)
+    if (this.hover && !isMobile) {
+      const tx = (mousepos.x - viewportWidth / 2) * 0.05;
+      const ty = (mousepos.y - viewportHeight / 2) * 0.05;
+
+      this.rendered.txCur = tx;
+      this.rendered.tyCur = ty;
+
+      this.rendered.txPrev = lerp(this.rendered.txPrev, this.rendered.txCur, 0.1);
+      this.rendered.tyPrev = lerp(this.rendered.tyPrev, this.rendered.tyCur, 0.1);
+
+      this.DOM.layers.forEach((layer) => {
+        const range = Number.parseFloat(layer.dataset.range ?? "0") || 0;
+        gsap.set(layer, {
+          x: this.rendered.txPrev * range * 4,
+          y: this.rendered.tyPrev * range * 4,
+        });
+      });
+    }
+  }
+}
+
+class ArcSlider {
+  container: HTMLElement;
+  wrapper: HTMLElement;
+  medias: NodeListOf<HTMLElement>;
+  items: ArcSliderItem[] = [];
+
+  viewportWidth = 0;
+  viewportHeight = 0;
+  isMobile = false;
+
+  mousepos: MousePos = { x: 0, y: 0 };
+
+  scroll = {
+    current: 0,
+    target: 0,
+    last: 0,
+    ease: 0.08,
+  };
+
+  isDown = false;
+  startX = 0;
+  scrollPos = 0;
+
+  rafId: number | null = null;
+  isRunning = false;
+
+  io?: IntersectionObserver;
+  isVisible = true;
+
+  // mousemove throttling
+  private mouseRAF: number | null = null;
+  private pendingMouse: MousePos | null = null;
+
+  constructor(container: HTMLElement) {
+    this.container = container;
+
+    const wrapper = container.querySelector(".slider-wrapper") as HTMLElement | null;
+    const medias = container.querySelectorAll<HTMLElement>(".slider-media");
+
+    if (!wrapper || medias.length === 0) {
+      // nothing to do
+      this.wrapper = container;
+      this.medias = medias;
+      return;
+    }
+
+    this.wrapper = wrapper;
+    this.medias = medias;
+
+    this.init();
+  }
+
+  init() {
+    // reduced motion: do not start
+    if (prefersReducedMotion()) return;
+
+    this.createMedias();
+    this.onResize();
+    this.addEvents();
+    this.setupVisibilityPause();
+    this.start();
+  }
+
+  createMedias() {
+    const originalList = Array.from(this.medias);
+    const minItems = 12;
+
+    if (originalList.length > 0 && originalList.length < minItems) {
+      const repeatCount = Math.ceil(minItems / originalList.length);
+      const fragment = document.createDocumentFragment();
+
+      for (let i = 0; i < repeatCount - 1; i++) {
+        originalList.forEach((item) => fragment.appendChild(item.cloneNode(true)));
+      }
+
+      this.wrapper.appendChild(fragment);
+      this.medias = this.wrapper.querySelectorAll<HTMLElement>(".slider-media");
+    }
+
+    const all = Array.from(this.medias);
+    this.items = all.map((el, i) => new ArcSliderItem(el, i, all.length));
+  }
+
+  onResize = () => {
+    const rect = this.container.getBoundingClientRect();
+    this.viewportWidth = rect.width;
+    this.viewportHeight = rect.height;
+    this.isMobile = this.viewportWidth < 768;
+
+    this.items.forEach((item) => item.onResize(this.viewportWidth));
+  };
+
+  onDown = (x: number) => {
+    this.isDown = true;
+    this.startX = x;
+    this.scrollPos = this.scroll.target;
+  };
+
+  onMove = (x: number) => {
+    if (!this.isDown) return;
+    const dist = (this.startX - x) * 1.5;
+    this.scroll.target = this.scrollPos + dist;
+  };
+
+  onUp = () => {
+    this.isDown = false;
+  };
+
+  addEvents() {
+    // mouse dragging
+    this.container.addEventListener("mousedown", (e) => this.onDown(e.clientX));
+    window.addEventListener("mousemove", (e) => this.onMove(e.clientX));
+    window.addEventListener("mouseup", this.onUp);
+
+    // touch dragging
+    this.container.addEventListener(
+      "touchstart",
+      (e) => this.onDown(e.touches[0].clientX),
+      { passive: true },
+    );
+    window.addEventListener(
+      "touchmove",
+      (e) => this.onMove(e.touches[0].clientX),
+      { passive: true },
+    );
+    window.addEventListener("touchend", this.onUp);
+
+    // mouse parallax (throttled)
+    this.container.addEventListener("mousemove", (ev) => {
+      const rect = this.container.getBoundingClientRect();
+      this.pendingMouse = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+
+      if (this.mouseRAF) return;
+      this.mouseRAF = requestAnimationFrame(() => {
+        if (this.pendingMouse) this.mousepos = this.pendingMouse;
+        this.pendingMouse = null;
+        this.mouseRAF = null;
+      });
+    });
+
+    window.addEventListener("resize", this.onResize);
+
+    // prevent clicks if dragging
+    this.container.addEventListener(
+      "click",
+      (e) => {
+        if (Math.abs(this.scroll.last - this.scroll.target) > 5) e.preventDefault();
+      },
+      true,
+    );
+  }
+
+  setupVisibilityPause() {
+    // Pause when tab hidden
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) this.stop();
+      else this.start();
+    });
+
+    // Pause when carousel offscreen
+    this.io = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        this.isVisible = Boolean(entry?.isIntersecting);
+
+        if (!this.isVisible) this.stop();
+        else this.start();
+      },
+      { threshold: 0.05 },
+    );
+
+    this.io.observe(this.container);
+  }
+
+  start() {
+    if (this.isRunning) return;
+    if (document.hidden) return;
+    if (!this.isVisible) return;
+
+    this.isRunning = true;
+    this.update();
+  }
+
+  stop() {
+    this.isRunning = false;
+    if (this.rafId) cancelAnimationFrame(this.rafId);
+    this.rafId = null;
+  }
+
+  update = () => {
+    if (!this.isRunning) return;
+
+    this.scroll.current = lerp(this.scroll.current, this.scroll.target, this.scroll.ease);
+
+    const direction: "left" | "right" =
+      this.scroll.current > this.scroll.last ? "right" : "left";
+
+    this.items.forEach((item) =>
+      item.update(
+        this.scroll.current,
+        direction,
+        this.viewportWidth,
+        this.viewportHeight,
+        this.mousepos,
+        this.isMobile,
+      ),
+    );
+
+    this.scroll.last = this.scroll.current;
+    this.rafId = requestAnimationFrame(this.update);
+  };
+}
+
+/* Init helpers (multi-carousel + HTMX safe) */
+function initArcCarousels(root: ParentNode = document) {
+  const carousels = root.querySelectorAll<HTMLElement>("[data-gsap-carousel]");
+
+  carousels.forEach((el) => {
+    if ((el as any).__arcInit) return;
+    (el as any).__arcInit = true;
+
+    // only init if gsap exists
+    if (typeof (window as any).gsap === "undefined") return;
+
+    new ArcSlider(el);
+  });
+}
+
+/* Boot on load + HTMX swaps */
+document.addEventListener("DOMContentLoaded", () => initArcCarousels());
+document.body.addEventListener("htmx:afterSwap", (e: any) => initArcCarousels(e.target));

@@ -1,0 +1,7 @@
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  {% for partner in partners %}
+    {% include "cms_integration/partials/cards/partner_card.html" with partner=partner %}
+  {% empty %}
+    <p class="text-text-muted">No partners yet.</p>
+  {% endfor %}
+</div>

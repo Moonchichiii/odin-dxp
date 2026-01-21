@@ -1,0 +1,37 @@
+{# templates/cms_integration/blocks/partners_carousel.html #}
+{% load static cloudinary_helper wagtailimages_tags %}
+
+<section class="relative w-full border-t border-odin-border bg-odin-bg overflow-hidden py-12">
+  <div class="container mx-auto px-6 mb-8 relative z-10 text-center">
+    <h2 class="font-display text-4xl font-bold text-white">{{ self.title|default:"Our Partners" }}</h2>
+    <p class="text-text-muted mt-2">Drag to explore</p>
+  </div>
+
+  <div
+    id="carousel-{{ block.id }}"
+    class="gsap-carousel relative w-full h-[600px] cursor-grab active:cursor-grabbing select-none overflow-hidden"
+    data-gsap-carousel
+  >
+    <div class="slider-viewport absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[80%] w-full will-change-transform">
+      <div class="slider-wrapper relative w-full h-full">
+
+        {% for partner in self.partners %}
+          <div
+            class="slider-media block absolute top-1/2 left-1/2 opacity-0 will-change-transform"
+            draggable="false"
+          >
+            {# One parallax layer wrapper so GSAP has something to move #}
+            <div class="slider-layer absolute inset-0" data-range="0.20">
+              {% include "cms_integration/partials/cards/partner_card.html" with partner=partner %}
+            </div>
+          </div>
+        {% endfor %}
+
+      </div>
+    </div>
+
+    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 text-white/30 text-xs font-mono pointer-events-none">
+      <span>◄</span> <span>DRAG</span> <span>►</span>
+    </div>
+  </div>
+</section>

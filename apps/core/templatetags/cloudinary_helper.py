@@ -61,3 +61,25 @@ def cld_img(
 
     transform_str = ",".join(transforms)
     return f"https://res.cloudinary.com/{cloud_name}/image/upload/{transform_str}/{public_id}"
+
+
+@register.simple_tag
+def cld_srcset(public_id: str | None, aspect_ratio: str = "4:3") -> str:
+    """
+    Generates a responsive srcset string.
+    Output: "url 600w, url 800w, url 1200w"
+    Uses: f_auto,q_auto,c_fill,g_auto + enforced aspect ratio.
+    """
+    if not public_id:
+        return ""
+
+    cloud_name = _cloud_name()
+    base_url = f"https://res.cloudinary.com/{cloud_name}/image/upload"
+
+    base_params = f"f_auto,q_auto,c_fill,g_auto,ar_{aspect_ratio}"
+
+    small = f"{base_url}/{base_params},w_600/{public_id} 600w"
+    medium = f"{base_url}/{base_params},w_800/{public_id} 800w"
+    large = f"{base_url}/{base_params},w_1200/{public_id} 1200w"
+
+    return f"{small}, {medium}, {large}"

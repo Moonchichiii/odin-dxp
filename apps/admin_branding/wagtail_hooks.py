@@ -78,10 +78,21 @@ def register_speakers_menu_item() -> MenuItem:
 def register_sponsors_menu_item() -> MenuItem:
     return MenuItem(
         "Sponsors",
-        snippet_list_url("cms_integration", "partner"),
-        icon_name="group",
+        snippet_list_url("cms_integration", "sponsor"),  # ✅ updated
+        icon_name="dollar-sign",  # ✅ clearer semantic icon
         order=210,
         classname="odin-menu-sponsors",
+    )
+
+
+@hooks.register("register_admin_menu_item")
+def register_partners_menu_item() -> MenuItem:
+    return MenuItem(
+        "Partners",
+        snippet_list_url("cms_integration", "partner"),  # ✅ new menu item
+        icon_name="group",
+        order=211,
+        classname="odin-menu-partners",
     )
 
 
@@ -90,7 +101,11 @@ def clean_sidebar_menu(_request: Any, menu_items: list[Any]) -> None:
     hidden = {"help", "reports"}
 
     # Hide "snippets" only if our custom snippet list URLs resolve.
-    if snippet_list_url("cms_integration", "speaker") and snippet_list_url("cms_integration", "partner"):
+    if (
+        snippet_list_url("cms_integration", "speaker")
+        and snippet_list_url("cms_integration", "sponsor")
+        and snippet_list_url("cms_integration", "partner")
+    ):
         hidden.add("snippets")
 
     menu_items[:] = [item for item in menu_items if getattr(item, "name", "") not in hidden]
@@ -120,7 +135,8 @@ class ClientQuickActionsPanel:
         flash_sale_url = safe_reverse("wagtailsettings:edit", "cms_integration", "flashsalesettings") or settings_index
 
         speakers_url = snippet_list_url("cms_integration", "speaker")
-        partners_url = snippet_list_url("cms_integration", "partner")
+        sponsors_url = snippet_list_url("cms_integration", "sponsor")  # ✅ updated
+        partners_url = snippet_list_url("cms_integration", "partner")  # ✅ new
 
         pages_url = safe_reverse("wagtailadmin_explore_root")
         home_edit_url = get_site_home_edit_url(request)
@@ -132,6 +148,7 @@ class ClientQuickActionsPanel:
             "footer_settings_url": footer_settings_url,
             "flash_sale_url": flash_sale_url,
             "speakers_url": speakers_url,
+            "sponsors_url": sponsors_url,
             "partners_url": partners_url,
             "cookie_settings_url": cookie_settings_url,
         }
