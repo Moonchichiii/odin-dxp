@@ -36,6 +36,12 @@
       </a>
     {% endif %}
 
+    {% if nexus_edit_url %}
+      <a class="button" href="{{ nexus_edit_url }}" style="border-color: #a855f7; color: #a855f7;">
+        {% icon name="list-ul" %} Nexus Grid
+      </a>
+    {% endif %}
+
     {% if header_settings_url %}
       <a class="button" href="{{ header_settings_url }}">
         {% icon name="site" %} Header
@@ -79,11 +85,11 @@
     {% endif %}
   </div>
 
-  <div style="margin-top: 1.5rem; border-top: 1px solid var(--w-color-border); padding-top: 1rem;">
+    <div style="margin-top: 1.5rem; border-top: 1px solid var(--w-color-border); padding-top: 1rem;">
     <p style="margin: 0; color: var(--w-color-text-context); font-size: 13px; line-height: 1.6;">
-      <strong>Pro Tip:</strong> Most content lives in the <em>Home Page</em> body blocks (drag to reorder).<br>
-      Use the <strong>“SEO & Social”</strong> tab to control how pages look on Google and LinkedIn.<br>
-      Use the <strong>“AEO / FAQ”</strong> block to optimize for voice search.
+      <strong>Pro Tip:</strong> Most site sections are managed in the <em>Home Page</em> “Body” blocks (drag to reorder).<br>
+      Add the <strong>Nexus Dynamic Feature Grid</strong> block to build the Z-pattern feature rows.<br>
+      Use the <strong>SEO &amp; Social</strong> tab to control how pages appear on Google and LinkedIn.
     </p>
   </div>
 </div>

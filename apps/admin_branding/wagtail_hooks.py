@@ -135,11 +135,12 @@ class ClientQuickActionsPanel:
         flash_sale_url = safe_reverse("wagtailsettings:edit", "cms_integration", "flashsalesettings") or settings_index
 
         speakers_url = snippet_list_url("cms_integration", "speaker")
-        sponsors_url = snippet_list_url("cms_integration", "sponsor")  # ✅ updated
-        partners_url = snippet_list_url("cms_integration", "partner")  # ✅ new
+        sponsors_url = snippet_list_url("cms_integration", "sponsor")
+        partners_url = snippet_list_url("cms_integration", "partner")
 
         pages_url = safe_reverse("wagtailadmin_explore_root")
         home_edit_url = get_site_home_edit_url(request)
+        nexus_edit_url = home_edit_url or pages_url
 
         context = {
             "home_edit_url": home_edit_url,
@@ -147,6 +148,7 @@ class ClientQuickActionsPanel:
             "header_settings_url": header_settings_url,
             "footer_settings_url": footer_settings_url,
             "flash_sale_url": flash_sale_url,
+            "nexus_edit_url": nexus_edit_url,
             "speakers_url": speakers_url,
             "sponsors_url": sponsors_url,
             "partners_url": partners_url,
