@@ -271,7 +271,7 @@ class SponsorGridBlock(blocks.StructBlock):
     )
 
     class Meta:
-        template = "cms_integration/blocks/sponsors_grid.html"
+        template = "cms_integration/blocks/sponsors_grid_block.html"
         icon = "group"
         label = "Sponsor Grid"
 
@@ -295,7 +295,7 @@ class PartnerCarouselBlock(blocks.StructBlock):
     )
 
     class Meta:
-        template = "cms_integration/blocks/partners_carousel.html"
+        template = "cms_integration/blocks/partner_carousel.html"
         icon = "gem"
         label = "Partner Carousel (3D)"
 

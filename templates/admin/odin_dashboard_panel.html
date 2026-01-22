@@ -21,7 +21,7 @@
   <div class="odin-dashboard-header">
     <h2>Client Quick Actions</h2>
     <p style="color: var(--w-color-text-context); margin: 0.25rem 0 0;">
-      Start here — safe editing, no code required.
+      Start here — safe editing for your website content.
     </p>
   </div>
 
@@ -36,9 +36,10 @@
       </a>
     {% endif %}
 
+    {# Custom Style for Nexus to make it pop #}
     {% if nexus_edit_url %}
-      <a class="button" href="{{ nexus_edit_url }}" style="border-color: #a855f7; color: #a855f7;">
-        {% icon name="list-ul" %} Nexus Grid
+      <a class="button" href="{{ nexus_edit_url }}" style="border-color: #7c3aed; color: #7c3aed; background-color: #f5f3ff;">
+        {% icon name="image" %} Add Nexus Feature
       </a>
     {% endif %}
 
@@ -50,7 +51,7 @@
 
     {% if footer_settings_url %}
       <a class="button" href="{{ footer_settings_url }}">
-        {% icon name="doc-full-inverse" %} Footer
+        {% icon name="doc-full-inverse" %} Footer & Legal
       </a>
     {% endif %}
 
@@ -87,9 +88,8 @@
 
     <div style="margin-top: 1.5rem; border-top: 1px solid var(--w-color-border); padding-top: 1rem;">
     <p style="margin: 0; color: var(--w-color-text-context); font-size: 13px; line-height: 1.6;">
-      <strong>Pro Tip:</strong> Most site sections are managed in the <em>Home Page</em> “Body” blocks (drag to reorder).<br>
-      Add the <strong>Nexus Dynamic Feature Grid</strong> block to build the Z-pattern feature rows.<br>
-      Use the <strong>SEO &amp; Social</strong> tab to control how pages appear on Google and LinkedIn.
+      <strong>New Feature:</strong> Use the <strong>Nexus Feature Grid</strong> block on the Home Page to create "Z-Pattern" layouts with auto-optimized images.<br>
+      <strong>Legal Updates:</strong> Company address and VAT numbers can now be edited inside the <em>Footer & Legal</em> settings.
     </p>
   </div>
 </div>

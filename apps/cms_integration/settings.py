@@ -123,25 +123,41 @@ class HeaderSettings(BaseSiteSetting):
 @register_setting(icon="doc-full-inverse", order=110)
 class FooterSettings(BaseSiteSetting):
     footer_description: models.TextField = models.TextField(
-        default="Event Intelligence Platform built for speed, clarity, and scale.",
+        default="Global AI & future-tech events platform. Connecting minds, shaping the future.",
         max_length=250,
-        help_text="Small blurb appearing below the logo in the footer.",
+        help_text="A short, high-impact value proposition appearing below the logo.",
     )
 
+    # === Navigation Columns ===
     footer_col_1_title: models.CharField = models.CharField(default="Explore", max_length=50)
     footer_col_1_links: StreamField = StreamField([("link", LinkBlock())], use_json_field=True, blank=True)
 
     footer_col_2_title: models.CharField = models.CharField(default="Company", max_length=50)
     footer_col_2_links: StreamField = StreamField([("link", LinkBlock())], use_json_field=True, blank=True)
 
-    # === NEW: Social Media & Toggle Configuration ===
+    # === Company Details (Template Placeholders) ===
+    company_name: models.CharField = models.CharField(
+        default="Nexus AI Events Global Ltd",
+        max_length=255,
+        help_text="The official registered company name.",
+    )
+    company_address: models.TextField = models.TextField(
+        default="Level 5, The Innovation Hub\n123 Future Tech Boulevard\nLondon, EC1V 9XX\nUnited Kingdom",
+        help_text="Full physical address. Use line breaks for formatting.",
+    )
+    company_numbers: models.TextField = models.TextField(
+        default="Company No: 12345678\nVAT No: GB 987 6543 21",
+        help_text="Registration and VAT numbers (separate with line breaks).",
+    )
+    copyright_text: models.CharField = models.CharField(
+        default="© Copyright 2026 • All rights reserved", max_length=255
+    )
+
+    # === Social Media ===
     show_floating_social_bar: models.BooleanField = models.BooleanField(
         default=True,
         verbose_name="Enable Floating Social Bar",
-        help_text=(
-            "If checked, a glass sidebar with social icons will appear on the right side of the screen "
-            "(Desktop only)."
-        ),
+        help_text="If checked, a sidebar with social icons on the right side of the screen",
     )
 
     social_linkedin: models.URLField = models.URLField(blank=True, help_text="LinkedIn URL")
@@ -166,7 +182,15 @@ class FooterSettings(BaseSiteSetting):
             ],
             heading="Column 2",
         ),
-        # === NEW PANEL GROUP ===
+        MultiFieldPanel(
+            [
+                FieldPanel("company_name"),
+                FieldPanel("company_address"),
+                FieldPanel("company_numbers"),
+                FieldPanel("copyright_text"),
+            ],
+            heading="Legal & Address",
+        ),
         MultiFieldPanel(
             [
                 FieldPanel("show_floating_social_bar"),
@@ -176,7 +200,7 @@ class FooterSettings(BaseSiteSetting):
                 FieldPanel("social_youtube"),
                 FieldPanel("social_facebook"),
             ],
-            heading="Social Media & Floating Bar",
+            heading="Social Media",
         ),
     ]
 
