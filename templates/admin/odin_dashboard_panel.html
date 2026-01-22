@@ -2,94 +2,192 @@
 
 <div class="odin-dashboard-card">
   <style>
-    .odin-dashboard-card .button {
+    .odin-dashboard-card {
+      border: 1px solid var(--w-color-border);
+      border-radius: 12px;
+      background: var(--w-color-surface);
+      padding: 1.25rem;
+    }
+
+    .odin-dashboard-card h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 650;
+      letter-spacing: 0.2px;
+    }
+
+    .odin-dashboard-subtitle {
+      margin: 0.35rem 0 0;
+      color: var(--w-color-text-context);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .odin-actions {
+      margin-top: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .odin-btn {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      padding: 0.6em 1.2em;
+      gap: 0.55rem;
+      padding: 0.55rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid var(--w-color-border);
+      background: var(--w-color-surface);
+      color: var(--w-color-text);
       text-decoration: none;
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 1;
+      transition: background 120ms ease, border-color 120ms ease, transform 120ms ease;
     }
-    .odin-dashboard-card .button .icon {
+
+    .odin-btn:hover {
+      background: var(--w-color-surface-hover, rgba(255,255,255,0.04));
+      border-color: var(--w-color-border-furniture, var(--w-color-border));
+      transform: translateY(-1px);
+    }
+
+    .odin-btn:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 128, 255, 0.25);
+    }
+
+    /* One primary action only */
+    .odin-btn--primary {
+      background: var(--w-color-primary);
+      color: var(--w-color-text-inverse);
+      border-color: transparent;
+    }
+    .odin-btn--primary:hover {
+      filter: brightness(1.02);
+    }
+
+    .odin-btn .icon {
       width: 14px;
       height: 14px;
-      margin-right: 8px;
       fill: currentColor;
-      vertical-align: middle;
+      flex: 0 0 auto;
+    }
+
+    .odin-section {
+      margin-top: 1.1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--w-color-border);
+    }
+
+    .odin-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--w-color-text-context);
+      margin: 0 0 0.75rem 0;
+    }
+
+    .odin-note {
+      margin: 0.75rem 0 0;
+      color: var(--w-color-text-context);
+      font-size: 12.5px;
+      line-height: 1.6;
     }
   </style>
 
   <div class="odin-dashboard-header">
     <h2>Client Quick Actions</h2>
-    <p style="color: var(--w-color-text-context); margin: 0.25rem 0 0;">
-      Start here — safe editing for your website content.
+    <p class="odin-dashboard-subtitle">
+      Start here — safe editing for your website content and settings.
     </p>
   </div>
 
-  <div style="margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem;">
+  <div class="odin-actions">
     {% if home_edit_url %}
-      <a class="button button-primary" href="{{ home_edit_url }}">
+      <a class="odin-btn odin-btn--primary" href="{{ home_edit_url }}">
         {% icon name="home" %} Edit Home Page
       </a>
     {% else %}
-      <a class="button button-primary" href="{{ pages_url }}">
+      <a class="odin-btn odin-btn--primary" href="{{ pages_url }}">
         {% icon name="folder-open-inverse" %} Pages
       </a>
     {% endif %}
 
-    {# Custom Style for Nexus to make it pop #}
-    {% if nexus_edit_url %}
-      <a class="button" href="{{ nexus_edit_url }}" style="border-color: #7c3aed; color: #7c3aed; background-color: #f5f3ff;">
-        {% icon name="image" %} Add Nexus Feature
-      </a>
-    {% endif %}
-
     {% if header_settings_url %}
-      <a class="button" href="{{ header_settings_url }}">
+      <a class="odin-btn" href="{{ header_settings_url }}">
         {% icon name="site" %} Header
       </a>
     {% endif %}
 
     {% if footer_settings_url %}
-      <a class="button" href="{{ footer_settings_url }}">
-        {% icon name="doc-full-inverse" %} Footer & Legal
-      </a>
-    {% endif %}
-
-    {% if flash_sale_url %}
-      <a class="button" href="{{ flash_sale_url }}" style="border-color: #ef4444; color: #ef4444;">
-        {% icon name="time" %} Flash Sale
-      </a>
-    {% endif %}
-
-    {% if speakers_url %}
-      <a class="button" href="{{ speakers_url }}">
-        {% icon name="user" %} Speakers
-      </a>
-    {% endif %}
-
-    {% if sponsors_url %}
-      <a class="button" href="{{ sponsors_url }}">
-        {% icon name="dollar-sign" %} Sponsors
-      </a>
-    {% endif %}
-
-    {% if partners_url %}
-      <a class="button" href="{{ partners_url }}">
-        {% icon name="group" %} Partners
+      <a class="odin-btn" href="{{ footer_settings_url }}">
+        {% icon name="doc-full-inverse" %} Footer
       </a>
     {% endif %}
 
     {% if cookie_settings_url %}
-      <a class="button" href="{{ cookie_settings_url }}">
-        {% icon name="locked" %} Privacy & Cookies
+      <a class="odin-btn" href="{{ cookie_settings_url }}">
+        {% icon name="locked" %} Cookies & Privacy
+      </a>
+    {% endif %}
+
+    {% if flash_sale_url %}
+      <a class="odin-btn" href="{{ flash_sale_url }}">
+        {% icon name="time" %} Flash Sale
       </a>
     {% endif %}
   </div>
 
-    <div style="margin-top: 1.5rem; border-top: 1px solid var(--w-color-border); padding-top: 1rem;">
-    <p style="margin: 0; color: var(--w-color-text-context); font-size: 13px; line-height: 1.6;">
-      <strong>New Feature:</strong> Use the <strong>Nexus Feature Grid</strong> block on the Home Page to create "Z-Pattern" layouts with auto-optimized images.<br>
-      <strong>Legal Updates:</strong> Company address and VAT numbers can now be edited inside the <em>Footer & Legal</em> settings.
+  <div class="odin-section">
+    <p class="odin-section-title">Content Collections</p>
+    <div class="odin-actions">
+      {% if speakers_url %}
+        <a class="odin-btn" href="{{ speakers_url }}">
+          {% icon name="user" %} Speakers
+        </a>
+      {% endif %}
+
+      {% if sponsors_url %}
+        <a class="odin-btn" href="{{ sponsors_url }}">
+          {% icon name="dollar-sign" %} Sponsors
+        </a>
+      {% endif %}
+
+      {% if partners_url %}
+        <a class="odin-btn" href="{{ partners_url }}">
+          {% icon name="group" %} Partners
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="odin-section">
+    <p class="odin-section-title">Social</p>
+    <div class="odin-actions">
+      {% if social_links_url %}
+        <a class="odin-btn" href="{{ social_links_url }}">
+          {% icon name="link" %} Social Links
+        </a>
+      {% endif %}
+
+      {% if social_sidebar_url %}
+        <a class="odin-btn" href="{{ social_sidebar_url }}">
+          {% icon name="cog" %} Social Sidebar
+        </a>
+      {% endif %}
+    </div>
+
+    <p class="odin-note">
+      Social Links control the URLs used across the site. Social Sidebar controls only the floating icon sidebar.
+    </p>
+  </div>
+
+  <div class="odin-section">
+    <p class="odin-note" style="margin-top: 0;">
+      <strong>Tip:</strong> Use the <strong>Nexus Feature Grid</strong> block on the Home Page to create Z-pattern layouts.<br>
+      <strong>Legal updates:</strong> Company address and registration details are edited in <em>Footer</em>.
     </p>
   </div>
 </div>

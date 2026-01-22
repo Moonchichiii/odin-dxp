@@ -78,8 +78,8 @@ def register_speakers_menu_item() -> MenuItem:
 def register_sponsors_menu_item() -> MenuItem:
     return MenuItem(
         "Sponsors",
-        snippet_list_url("cms_integration", "sponsor"),  # ✅ updated
-        icon_name="dollar-sign",  # ✅ clearer semantic icon
+        snippet_list_url("cms_integration", "sponsor"),
+        icon_name="dollar-sign",
         order=210,
         classname="odin-menu-sponsors",
     )
@@ -89,7 +89,7 @@ def register_sponsors_menu_item() -> MenuItem:
 def register_partners_menu_item() -> MenuItem:
     return MenuItem(
         "Partners",
-        snippet_list_url("cms_integration", "partner"),  # ✅ new menu item
+        snippet_list_url("cms_integration", "partner"),
         icon_name="group",
         order=211,
         classname="odin-menu-partners",
@@ -100,7 +100,6 @@ def register_partners_menu_item() -> MenuItem:
 def clean_sidebar_menu(_request: Any, menu_items: list[Any]) -> None:
     hidden = {"help", "reports"}
 
-    # Hide "snippets" only if our custom snippet list URLs resolve.
     if (
         snippet_list_url("cms_integration", "speaker")
         and snippet_list_url("cms_integration", "sponsor")
@@ -123,6 +122,7 @@ class ClientQuickActionsPanel:
         request: HttpRequest = parent_context["request"]
 
         settings_index = safe_reverse("wagtailsettings:index")
+
         header_settings_url = (
             safe_reverse("wagtailsettings:edit", "cms_integration", "headersettings") or settings_index
         )
@@ -134,25 +134,32 @@ class ClientQuickActionsPanel:
         )
         flash_sale_url = safe_reverse("wagtailsettings:edit", "cms_integration", "flashsalesettings") or settings_index
 
+        social_links_url = (
+            safe_reverse("wagtailsettings:edit", "cms_integration", "sociallinkssettings") or settings_index
+        )
+        social_sidebar_url = (
+            safe_reverse("wagtailsettings:edit", "cms_integration", "socialsidebarsettings") or settings_index
+        )
+
         speakers_url = snippet_list_url("cms_integration", "speaker")
         sponsors_url = snippet_list_url("cms_integration", "sponsor")
         partners_url = snippet_list_url("cms_integration", "partner")
 
         pages_url = safe_reverse("wagtailadmin_explore_root")
         home_edit_url = get_site_home_edit_url(request)
-        nexus_edit_url = home_edit_url or pages_url
 
         context = {
             "home_edit_url": home_edit_url,
             "pages_url": pages_url,
             "header_settings_url": header_settings_url,
             "footer_settings_url": footer_settings_url,
+            "cookie_settings_url": cookie_settings_url,
             "flash_sale_url": flash_sale_url,
-            "nexus_edit_url": nexus_edit_url,
             "speakers_url": speakers_url,
             "sponsors_url": sponsors_url,
             "partners_url": partners_url,
-            "cookie_settings_url": cookie_settings_url,
+            "social_links_url": social_links_url,
+            "social_sidebar_url": social_sidebar_url,
         }
 
         html = render_to_string("admin/odin_dashboard_panel.html", context=context, request=request)

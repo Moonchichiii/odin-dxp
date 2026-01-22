@@ -128,59 +128,85 @@ class FooterSettings(BaseSiteSetting):
         help_text="A short, high-impact value proposition appearing below the logo.",
     )
 
-    # === Navigation Columns ===
-    footer_col_1_title: models.CharField = models.CharField(default="Explore", max_length=50)
-    footer_col_1_links: StreamField = StreamField([("link", LinkBlock())], use_json_field=True, blank=True)
+    footer_col_1_title: models.CharField = models.CharField(
+        default="Explore",
+        max_length=50,
+    )
+    footer_col_1_links: StreamField = StreamField(
+        [("link", LinkBlock())],
+        use_json_field=True,
+        blank=True,
+    )
 
-    footer_col_2_title: models.CharField = models.CharField(default="Company", max_length=50)
-    footer_col_2_links: StreamField = StreamField([("link", LinkBlock())], use_json_field=True, blank=True)
+    footer_col_2_title: models.CharField = models.CharField(
+        default="Company",
+        max_length=50,
+    )
+    footer_col_2_links: StreamField = StreamField(
+        [("link", LinkBlock())],
+        use_json_field=True,
+        blank=True,
+    )
 
-    # === Company Details (Template Placeholders) ===
     company_name: models.CharField = models.CharField(
         default="Nexus AI Events Global Ltd",
         max_length=255,
-        help_text="The official registered company name.",
     )
     company_address: models.TextField = models.TextField(
-        default="Level 5, The Innovation Hub\n123 Future Tech Boulevard\nLondon, EC1V 9XX\nUnited Kingdom",
-        help_text="Full physical address. Use line breaks for formatting.",
+        default=("Level 5, The Innovation Hub\n" "123 Future Tech Boulevard\n" "London, EC1V 9XX\n" "United Kingdom"),
     )
     company_numbers: models.TextField = models.TextField(
         default="Company No: 12345678\nVAT No: GB 987 6543 21",
-        help_text="Registration and VAT numbers (separate with line breaks).",
     )
+
     copyright_text: models.CharField = models.CharField(
-        default="© Copyright 2026 • All rights reserved", max_length=255
+        default="All rights reserved",
+        max_length=255,
+        help_text="Text shown after the automatic year.",
     )
 
-    # === Social Media ===
-    show_floating_social_bar: models.BooleanField = models.BooleanField(
+    show_footer_social_icons: models.BooleanField = models.BooleanField(
         default=True,
-        verbose_name="Enable Floating Social Bar",
-        help_text="If checked, a sidebar with social icons on the right side of the screen",
+        verbose_name="Show Social Icons Inside Footer",
     )
 
-    social_linkedin: models.URLField = models.URLField(blank=True, help_text="LinkedIn URL")
-    social_x: models.URLField = models.URLField(blank=True, help_text="X (Twitter) URL")
-    social_instagram: models.URLField = models.URLField(blank=True, help_text="Instagram URL")
-    social_youtube: models.URLField = models.URLField(blank=True, help_text="YouTube URL")
-    social_facebook: models.URLField = models.URLField(blank=True, help_text="Facebook URL")
+    # === Contact block ===
+    show_enquiries_block: models.BooleanField = models.BooleanField(
+        default=True,
+        verbose_name="Show Contact Block",
+        help_text="Toggle the contact section in the footer.",
+    )
+
+    enquiries_title: models.CharField = models.CharField(
+        default="Enquiries",
+        max_length=50,
+        help_text="Heading shown above the contact details.",
+    )
+
+    enquiries_email: models.EmailField = models.EmailField(
+        blank=True,
+        help_text="Contact email shown in the footer.",
+    )
+
+    enquiries_phone: models.CharField = models.CharField(
+        blank=True,
+        max_length=30,
+        help_text="Optional phone number (e.g. +44 20 1234 5678).",
+    )
 
     panels = [
         FieldPanel("footer_description"),
         MultiFieldPanel(
-            [
-                FieldPanel("footer_col_1_title"),
-                FieldPanel("footer_col_1_links"),
-            ],
-            heading="Column 1",
+            [FieldPanel("show_footer_social_icons")],
+            heading="Footer: Social Icons",
         ),
         MultiFieldPanel(
-            [
-                FieldPanel("footer_col_2_title"),
-                FieldPanel("footer_col_2_links"),
-            ],
-            heading="Column 2",
+            [FieldPanel("footer_col_1_title"), FieldPanel("footer_col_1_links")],
+            heading="Footer Column 1",
+        ),
+        MultiFieldPanel(
+            [FieldPanel("footer_col_2_title"), FieldPanel("footer_col_2_links")],
+            heading="Footer Column 2",
         ),
         MultiFieldPanel(
             [
@@ -193,14 +219,12 @@ class FooterSettings(BaseSiteSetting):
         ),
         MultiFieldPanel(
             [
-                FieldPanel("show_floating_social_bar"),
-                FieldPanel("social_linkedin"),
-                FieldPanel("social_x"),
-                FieldPanel("social_instagram"),
-                FieldPanel("social_youtube"),
-                FieldPanel("social_facebook"),
+                FieldPanel("show_enquiries_block"),
+                FieldPanel("enquiries_title"),
+                FieldPanel("enquiries_email"),
+                FieldPanel("enquiries_phone"),
             ],
-            heading="Social Media",
+            heading="Footer Contact",
         ),
     ]
 
@@ -208,7 +232,56 @@ class FooterSettings(BaseSiteSetting):
         verbose_name = "Footer Configuration"
 
 
-@register_setting(icon="time", order=120)
+@register_setting(icon="link", order=120)
+class SocialLinksSettings(BaseSiteSetting):
+    """
+    Canonical social URLs used across the site (footer + sidebar).
+    """
+
+    linkedin: models.URLField = models.URLField(blank=True, verbose_name="LinkedIn URL")
+    x: models.URLField = models.URLField(blank=True, verbose_name="X (Twitter) URL")
+    instagram: models.URLField = models.URLField(blank=True, verbose_name="Instagram URL")
+    youtube: models.URLField = models.URLField(blank=True, verbose_name="YouTube URL")
+    facebook: models.URLField = models.URLField(blank=True, verbose_name="Facebook URL")
+
+    panels = [
+        MultiFieldPanel(
+            [
+                FieldPanel("linkedin"),
+                FieldPanel("x"),
+                FieldPanel("instagram"),
+                FieldPanel("youtube"),
+                FieldPanel("facebook"),
+            ],
+            heading="Social Links",
+        )
+    ]
+
+    class Meta:
+        verbose_name = "Social Links (URLs)"
+
+
+@register_setting(icon="cog", order=130)
+class SocialSidebarSettings(BaseSiteSetting):
+    """
+    Controls ONLY the floating social sidebar (templates/partials/social_floating.html).
+    """
+
+    enabled: models.BooleanField = models.BooleanField(
+        default=True,
+        verbose_name="Enable Floating Social Sidebar",
+        help_text="Shows the floating sidebar on the right. Template: templates/partials/social_floating.html",
+    )
+
+    panels = [
+        FieldPanel("enabled"),
+    ]
+
+    class Meta:
+        verbose_name = "Social Sidebar (Toggle)"
+
+
+@register_setting(icon="time", order=130)
 class FlashSaleSettings(BaseSiteSetting):
     is_active: models.BooleanField = models.BooleanField(
         default=False,
@@ -265,7 +338,7 @@ class FlashSaleSettings(BaseSiteSetting):
         verbose_name = "Flash Sale Configuration"
 
 
-@register_setting(icon="locked", order=130)
+@register_setting(icon="locked", order=150)
 class CookieSettings(BaseSiteSetting):
     is_active: models.BooleanField = models.BooleanField(
         default=True,
