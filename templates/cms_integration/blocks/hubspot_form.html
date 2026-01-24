@@ -1,0 +1,42 @@
+{# templates/blocks/hubspot_form.html #}
+{% load wagtailsettings_tags %}
+{% get_settings as settings %}
+{% with m=settings.cms_integration.MarketingIntegrationsSettings %}
+  {% if value.heading %}<h3 class="text-xl font-semibold mb-4">{{ value.heading }}</h3>{% endif %}
+
+  <div
+    class="hubspot-form"
+    data-portal-id="{{ m.hubspot_portal_id }}"
+    data-form-id="{{ value.form_id }}"
+  ></div>
+
+  {# Load script once per page #}
+  {% if m.hubspot_portal_id %}
+    {% if not request._hubspot_loaded %}
+      {% firstof "" "" %}
+      <script>
+        // mark as loaded (simple trick; best is a context processor or inclusion tag)
+        window.__hubspotFormsLoaded = window.__hubspotFormsLoaded || false;
+      </script>
+      <script src="https://js.hsforms.net/forms/v2.js" defer></script>
+      <script>
+        document.addEventListener("DOMContentLoaded", function() {
+          if (window.__hubspotFormsLoaded) return;
+          window.__hubspotFormsLoaded = true;
+
+          document.querySelectorAll(".hubspot-form").forEach(function(el){
+            var portalId = el.getAttribute("data-portal-id");
+            var formId = el.getAttribute("data-form-id");
+            if (!portalId || !formId) return;
+
+            hbspt.forms.create({
+              portalId: portalId,
+              formId: formId,
+              target: el
+            });
+          });
+        });
+      </script>
+    {% endif %}
+  {% endif %}
+{% endwith %}

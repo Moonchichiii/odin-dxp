@@ -322,3 +322,13 @@ class FAQSectionBlock(blocks.StructBlock):
         template = "cms_integration/blocks/faq_section_block.html"
         icon = "help"
         label = "FAQ Section"
+
+
+class HubSpotFormBlock(blocks.StructBlock):
+    heading = blocks.CharBlock(required=False)
+    form_id = blocks.CharBlock(required=True, help_text="HubSpot Form ID (GUID)")
+
+    class Meta:
+        template = "blocks/hubspot_form.html"
+        icon = "form"
+        label = "HubSpot Form"

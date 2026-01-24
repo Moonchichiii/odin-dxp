@@ -280,16 +280,22 @@ class ArcSliderItem {
     });
   }
 
-  onResize(viewportWidth: number) {
-    this.width = viewportWidth < 768 ? 240 : 320;
-    this.height = viewportWidth < 768 ? 320 : 420;
-    this.padding = 40;
+   onResize(viewportWidth: number) {
+    // FIX: Optimized dimensions for Mobile (Fits iPhone/Android screens comfortably)
+
+    // Mobile: 200px wide x 280px tall (Small Poster)
+    // Desktop: 280px wide x 400px tall (Standard Poster)
+    this.width = viewportWidth < 768 ? 200 : 280;
+    this.height = viewportWidth < 768 ? 280 : 400;
+
+    // Tighter spacing on mobile
+    this.padding = viewportWidth < 768 ? 15 : 40;
 
     this.widthTotal = (this.width + this.padding) * this.length;
     this.x = (this.width + this.padding) * this.index;
 
-    // bigger = flatter arc
-    this.r = viewportWidth * 2;
+    // Adjust arc radius: Flatter on mobile to prevent extreme distortion/overflow
+    this.r = viewportWidth * (viewportWidth < 768 ? 3 : 2.5);
 
     this.DOM.el.style.width = `${this.width}px`;
     this.DOM.el.style.height = `${this.height}px`;

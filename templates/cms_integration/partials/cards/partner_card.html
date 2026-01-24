@@ -1,48 +1,67 @@
 {% load cloudinary_helper wagtailimages_tags %}
 
-<!--
-  NOTE: We removed the fixed width/height here.
-  The parent carousel determines the size.
--->
 <a
   href="{{ partner.website|default:'#' }}"
-  class="partner-link group block w-full h-full relative"
+  class="partner-link group block w-full h-full relative overflow-hidden rounded-[20px] md:rounded-[32px] transition-transform duration-500 ease-out hover:-translate-y-2 bg-[#020617]"
   {% if partner.website %}target="_blank" rel="noopener"{% endif %}
 >
-  <!-- 1. The Glass Pane -->
-  <div class="absolute inset-0 rounded-xl bg-white/[0.03] border border-white/[0.1] backdrop-blur-sm transition-all duration-300 group-hover:bg-white/[0.08] group-hover:border-primary/30 group-hover:shadow-[0_0_30px_rgba(16,185,129,0.15)]"></div>
+  <!-- 1. Card Background (Deep Gradient) -->
+  <div class="absolute inset-0 bg-gradient-to-br from-[#1e1b4b] to-[#020617] border border-white/10 transition-colors duration-500 group-hover:from-primary-dim/80 group-hover:to-[#020617]"></div>
 
-  <!-- 2. Content -->
-  <div class="relative h-full flex flex-col items-center justify-center p-6 text-center z-10">
+  <!-- 2. Decorative Background Text (Responsive Sizing Fix) -->
+  <div class="absolute inset-0 flex flex-col items-center justify-center opacity-20 pointer-events-none overflow-hidden leading-none select-none">
+      <!-- Changed text-7xl to text-5xl for mobile -->
+      <span class="text-5xl md:text-8xl font-display font-bold text-outline uppercase whitespace-nowrap -rotate-12 scale-150 origin-center transition-transform duration-700 group-hover:scale-110 group-hover:rotate-0">
+          {{ partner.name }}
+      </span>
+      <span class="text-5xl md:text-8xl font-display font-bold text-outline uppercase whitespace-nowrap -rotate-12 scale-150 origin-center ml-12 md:ml-24 transition-transform duration-700 group-hover:scale-110 group-hover:rotate-0 delay-75">
+          {{ partner.name }}
+      </span>
+      <span class="text-5xl md:text-8xl font-display font-bold text-outline uppercase whitespace-nowrap -rotate-12 scale-150 origin-center -ml-12 md:-ml-24 transition-transform duration-700 group-hover:scale-110 group-hover:rotate-0 delay-100">
+          {{ partner.name }}
+      </span>
+  </div>
 
-    <!-- Logo -->
-    <div class="h-16 w-full flex items-center justify-center mb-4 transition-transform duration-500 group-hover:scale-110 group-hover:-translate-y-2">
+  <!-- 3. Glass Shine Overlay -->
+  <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-50 pointer-events-none"></div>
+
+  <!-- 4. Main Content Area (Logo) -->
+  <div class="relative h-full w-full flex flex-col items-center justify-center z-10 p-4 md:p-8">
+
+    <!-- Floating Logo -->
+    <div class="relative w-full aspect-square flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
       {% if partner.logo_upload %}
-        {% image partner.logo_upload max-300x150 class="max-h-full max-w-full object-contain filter grayscale brightness-150 contrast-125 opacity-70 transition-all duration-300 group-hover:filter-none group-hover:opacity-100" alt=partner.name loading="lazy" %}
+        <!-- Logic preserved: Removed grayscale filters -->
+        {% image partner.logo_upload width-500 format-webp class="w-full h-full object-contain filter drop-shadow-2xl" alt=partner.name %}
+
       {% elif partner.logo_public_id %}
+        <!-- Logic preserved: Fixed crop error -->
         <img
-          src="{% cld_img partner.logo_public_id width=300 height=150 gravity='auto' %}"
+          src="{% cld_img partner.logo_public_id width=500 %}"
           alt="{{ partner.name }}"
-          class="max-h-full max-w-full object-contain filter grayscale brightness-150 contrast-125 opacity-70 transition-all duration-300 group-hover:filter-none group-hover:opacity-100"
+          class="w-full h-full object-contain filter drop-shadow-2xl"
           loading="lazy"
         />
+
       {% else %}
-        <span class="text-xs font-mono text-white/30">NO LOGO</span>
+        <!-- Fallback if no logo -->
+        <span class="text-6xl md:text-8xl font-display font-bold text-white opacity-20">{{ partner.name|slice:":1" }}</span>
       {% endif %}
     </div>
 
-    <!-- Name -->
-    <h3 class="text-sm font-bold text-white/60 transition-colors duration-300 group-hover:text-white">{{ partner.name }}</h3>
-
-    {% if partner.tier %}
-      <span class="text-[10px] uppercase tracking-widest text-primary/60 mt-1 font-mono">{{ partner.tier }}</span>
-    {% endif %}
   </div>
 
-  <!-- 3. Visit Icon (Pops up on hover) -->
+  <!-- 5. Bottom Badge -->
+  <div class="absolute bottom-6 left-0 right-0 flex justify-center z-20">
+      <div class="bg-white/90 text-odin-bg px-3 py-1.5 md:px-5 md:py-2 rounded-full text-[10px] md:text-xs font-bold font-mono uppercase tracking-widest shadow-lg transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 delay-100">
+          {{ partner.name }}
+      </div>
+  </div>
+
+  <!-- 6. Visit Icon -->
   {% if partner.website %}
-  <div class="absolute -top-3 -right-3 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-odin-bg shadow-lg opacity-0 scale-0 transition-all duration-300 group-hover:opacity-100 group-hover:scale-100 z-20">
-    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
-  </div>
+    <div class="absolute top-4 right-4 md:top-6 md:right-6 z-20 w-8 h-8 md:w-10 md:h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 text-white transition-all duration-300 group-hover:bg-primary group-hover:text-odin-bg group-hover:rotate-45">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="md:w-[18px] md:h-[18px]"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+    </div>
   {% endif %}
 </a>
